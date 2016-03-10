@@ -28,7 +28,7 @@
             android:layout_marginLeft="@dimen/half_margin"
             android:layout_marginRight="@dimen/half_margin"
             android:layout_weight="1"
-            android:text="@string/alert_button_update" />
+            android:text="@string/update" />
 
         <Button
             android:id="@+id/btnSirenNextTime"
@@ -37,7 +37,7 @@
             android:layout_marginLeft="@dimen/half_margin"
             android:layout_marginRight="@dimen/half_margin"
             android:layout_weight="1"
-            android:text="@string/alert_button_next_time"
+            android:text="@string/next_time"
             android:visibility="gone"/>
 
     </LinearLayout>
@@ -47,7 +47,7 @@
         android:layout_height="@dimen/button_height"
         android:layout_marginLeft="@dimen/half_margin"
         android:layout_marginRight="@dimen/half_margin"
-        android:text="@string/alert_button_next_skip"
+        android:text="@string/skip_this_version"
         android:visibility="gone"/>
 
 

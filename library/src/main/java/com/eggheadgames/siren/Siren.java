@@ -23,7 +23,8 @@ public class Siren {
     /**JSON format should be the following
      * {
      *     "com.example.app": {
-     *         "minVersionCode": 7
+     *         "minVersionCode": 7,
+     *         "minVersionName": "1.0.0.0"
      *     }
      * }
      */
@@ -31,11 +32,34 @@ public class Siren {
     private static Siren ourInstance = new Siren();
     private ISirenListener sirenListener;
     private Context context;
-    private SirenAlertType alertType = SirenAlertType.OPTION;
     private WeakReference<Activity> activityRef;
 
     /**
-     *
+     * Determines alert type during version code verification
+     */
+    private SirenAlertType versionCodeUpdateAlertType = SirenAlertType.OPTION;
+
+    /**
+     * Determines the type of alert that should be shown for major version updates: A.b.c
+     */
+    private SirenAlertType majorUpdateAlertType = SirenAlertType.OPTION;
+
+    /**
+     * Determines the type of alert that should be shown for minor version updates: a.B.c
+     */
+    private SirenAlertType minorUpdateAlertType  = SirenAlertType.OPTION;
+
+    /**
+     Determines the type of alert that should be shown for minor patch updates: a.b.C
+     */
+    private SirenAlertType patchUpdateAlertType = SirenAlertType.OPTION;
+
+    /**
+     Determines the type of alert that should be shown for revision updates: a.b.c.D
+     */
+    private SirenAlertType revisionUpdateAlertType = SirenAlertType.OPTION;
+
+    /**
      * @param context - you should use an Application context here in order to not cause memory leaks
      * @return
      */
@@ -45,14 +69,6 @@ public class Siren {
     }
 
     private Siren() {
-    }
-
-    public void setSirenListener(ISirenListener sirenListener) {
-        this.sirenListener = sirenListener;
-    }
-
-    public void setAlertType(SirenAlertType alertType) {
-        this.alertType = alertType;
     }
 
     public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl) {
@@ -82,19 +98,13 @@ public class Siren {
             if (!rootJson.isNull(SirenHelper.getPackageName(context))) {
                 JSONObject appJson = rootJson.getJSONObject(SirenHelper.getPackageName(context));
 
-                if (!appJson.isNull(Constants.JSON_MIN_VERSION_CODE)) {
-                    int minAppVersion = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
-
-                    //save last successful verification date
-                    SirenHelper.setLastVerificationDate(context);
-
-                    if (SirenHelper.getVersionCode(context) < minAppVersion
-                            && SirenHelper.isVersionSkippedByUser(context, minAppVersion)) {
-                        showAlert(minAppVersion);
-                    }
-                } else {
-                    throw new JSONException("field not found");
+                //version name have higher priority
+                if (checkVersionName(appJson)) {
+                    return;
                 }
+
+                checkVersionCode(appJson);
+
             } else {
                 throw new JSONException("field not found");
             }
@@ -107,14 +117,91 @@ public class Siren {
         }
     }
 
-    private void showAlert(int minAppVersion) {
-        if (alertType == SirenAlertType.NONE) {
+    private boolean checkVersionName(JSONObject appJson) throws JSONException{
+        if (!appJson.isNull(Constants.JSON_MIN_VERSION_NAME)) {
+
+            //save last successful verification date
+            SirenHelper.setLastVerificationDate(context);
+
+            String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
+            String currentVersionName = SirenHelper.getVersionName(context);
+
+            SirenAlertType alertType = null;
+            if (!TextUtils.isEmpty(minVersionName) && !TextUtils.isEmpty(currentVersionName)
+                    && !SirenHelper.isVersionSkippedByUser(context, minVersionName)) {
+                String[] minVersionNumbers = minVersionName.split("\\.");
+                String[] currentVersionNumbers = currentVersionName.split("\\.");
+                if (minVersionNumbers != null && currentVersionNumbers != null
+                        && minVersionNumbers.length == currentVersionNumbers.length) {
+                    if (minVersionNumbers.length > 0 && SirenHelper.isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
+                        alertType = majorUpdateAlertType;
+                    } else if (minVersionNumbers.length > 1 && SirenHelper.isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
+                        alertType = minorUpdateAlertType;
+                    } else if (minVersionNumbers.length > 2 && SirenHelper.isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
+                        alertType = patchUpdateAlertType;
+                    } else if (minVersionNumbers.length > 3 && SirenHelper.isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
+                        alertType = revisionUpdateAlertType;
+                    }
+
+                    if (alertType != null) {
+                        showAlert(minVersionName, alertType);
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean checkVersionCode(JSONObject appJson) throws JSONException{
+        if (!appJson.isNull(Constants.JSON_MIN_VERSION_CODE)) {
+            int minAppVersionCode = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
+
+            //save last successful verification date
+            SirenHelper.setLastVerificationDate(context);
+
+            if (SirenHelper.getVersionCode(context) < minAppVersionCode
+                    && !SirenHelper.isVersionSkippedByUser(context, String.valueOf(minAppVersionCode))) {
+                showAlert(String.valueOf(minAppVersionCode), versionCodeUpdateAlertType);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showAlert(String appVersion, SirenAlertType alertType) {
+        if (versionCodeUpdateAlertType == SirenAlertType.NONE) {
             if (sirenListener != null) {
-                sirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(context));
+                sirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(context, appVersion));
             }
         } else {
-            new SirenAlertWrapper(activityRef.get(), sirenListener, alertType, minAppVersion).show();
+            new SirenAlertWrapper(activityRef.get(), sirenListener, alertType, appVersion).show();
         }
+    }
+
+    public void setMajorUpdateAlertType(SirenAlertType majorUpdateAlertType) {
+        this.majorUpdateAlertType = majorUpdateAlertType;
+    }
+
+    public void setMinorUpdateAlertType(SirenAlertType minorUpdateAlertType) {
+        this.minorUpdateAlertType = minorUpdateAlertType;
+    }
+
+    public void setPatchUpdateAlertType(SirenAlertType patchUpdateAlertType) {
+        this.patchUpdateAlertType = patchUpdateAlertType;
+    }
+
+    public void setRevisionUpdateAlertType(SirenAlertType revisionUpdateAlertType) {
+        this.revisionUpdateAlertType = revisionUpdateAlertType;
+    }
+
+    public void setSirenListener(ISirenListener sirenListener) {
+        this.sirenListener = sirenListener;
+    }
+
+    public void setVersionCodeUpdateAlertType(SirenAlertType versionCodeUpdateAlertType) {
+        this.versionCodeUpdateAlertType = versionCodeUpdateAlertType;
     }
 
     public static class LoadJsonTask extends AsyncTask<String, Void, String> {

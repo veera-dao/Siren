@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -40,9 +41,9 @@ public class SirenHelper {
         }
     }
 
-    protected static boolean isVersionSkippedByUser(Context context, int minAppVersion) {
-        int skippedVersion = PreferenceManager.getDefaultSharedPreferences(context).getInt(Constants.PREFERENCES_SKIPPED_VERSION, 0);
-        return minAppVersion == skippedVersion;
+    protected static boolean isVersionSkippedByUser(Context context, String minAppVersion) {
+        String skippedVersion = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PREFERENCES_SKIPPED_VERSION, "");
+        return skippedVersion.equals(minAppVersion);
     }
 
     protected static void setLastVerificationDate(Context context) {
@@ -51,21 +52,21 @@ public class SirenHelper {
                 .commit();
     }
 
-    public static String getAlertMessage(Context context) {
+    public static String getAlertMessage(Context context, String minAppVersion) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
-                return context.getString(R.string.alert_message_pattern, context.getString(context.getApplicationInfo().labelRes));
+                return context.getString(R.string.update_alert_message, context.getString(context.getApplicationInfo().labelRes), minAppVersion);
             } else {
-                return context.getString(R.string.alert_message_pattern, context.getString(R.string.fallback_app_name));
+                return context.getString(R.string.update_alert_message, context.getString(R.string.fallback_app_name), minAppVersion);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return context.getString(R.string.alert_message_pattern, context.getString(R.string.fallback_app_name));
+            return context.getString(R.string.update_alert_message, context.getString(R.string.fallback_app_name), minAppVersion);
         }
     }
 
     public static void openGooglePlay(Activity activity) {
-        final String appPackageName = getPackageName(activity); // getPackageName() from Context or Activity object
+        final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
         } catch (android.content.ActivityNotFoundException anfe) {
@@ -73,9 +74,26 @@ public class SirenHelper {
         }
     }
 
-    public static void setVersionSkippedByUser(Context context, int skippedVersion) {
+    public static void setVersionSkippedByUser(Context context, String skippedVersion) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putInt(Constants.PREFERENCES_SKIPPED_VERSION, skippedVersion)
+                .putString(Constants.PREFERENCES_SKIPPED_VERSION, skippedVersion)
                 .commit();
+    }
+
+    public static String getVersionName(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static boolean isGreater(String first, String second) {
+        if (TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second)) {
+            return Integer.parseInt(first) > Integer.parseInt(second);
+        }
+        return false;
     }
 }

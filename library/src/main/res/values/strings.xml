@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Siren</string>
-    <string name="alert_message_pattern">A new version of %s is available. Please update to new version now.</string>
-    <string name="alert_title">Update available</string>
     <string name="fallback_app_name">application</string>
-    <string name="alert_button_update">Update</string>
-    <string name="alert_button_next_time">Next time</string>
-    <string name="alert_button_next_skip">Skip this version</string>
+    
+    <string name="update_alert_message" formatted="false">A new version of %s is available. Please update to version %s now.</string>
+    <string name="update_available">Update available</string>
+    <string name="update">Update</string>
+    <string name="next_time">Next time</string>
+    <string name="skip_this_version">Skip this version</string>
 </resources>

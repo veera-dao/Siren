@@ -17,16 +17,16 @@ public class SirenAlertWrapper {
     private int theme;
     private ISirenListener sirenListener;
     private SirenAlertType sirenAlertType;
-    private int minAppVersion;
+    private String minAppVersion;
 
-    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, int minAppVersion) {
+    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion) {
         this.sirenListener = sirenListener;
         this.sirenAlertType = sirenAlertType;
         this.minAppVersion = minAppVersion;
         activityRef = new WeakReference<Activity>(activity);
     }
 
-    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, int minAppVersion, int theme) {
+    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, int theme) {
         this(activity, sirenListener, sirenAlertType, minAppVersion);
         this.theme = theme;
     }
@@ -43,6 +43,8 @@ public class SirenAlertWrapper {
             dialog.setCancelable(false);
             dialog.show();
 
+            sirenListener.onShowUpdateDialog();
+
 
         } else {
             if (sirenListener != null) {
@@ -52,14 +54,14 @@ public class SirenAlertWrapper {
     }
 
     private void setupDialog(final Dialog dialog) {
-        dialog.setTitle(R.string.alert_title);
+        dialog.setTitle(R.string.update_available);
         dialog.setContentView(R.layout.siren_dialog);
         TextView message = (TextView) dialog.findViewById(R.id.tvSirenAlertMessage);
         Button update = (Button) dialog.findViewById(R.id.btnSirenUpdate);
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
         final Button skip = (Button) dialog.findViewById(R.id.btnSirenSkip);
 
-        message.setText(SirenHelper.getAlertMessage(activityRef.get()));
+        message.setText(SirenHelper.getAlertMessage(activityRef.get(), minAppVersion));
 
         if (sirenAlertType == SirenAlertType.FORCE
                 || sirenAlertType == SirenAlertType.OPTION
