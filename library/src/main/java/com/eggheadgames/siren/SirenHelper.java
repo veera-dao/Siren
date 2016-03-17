@@ -22,7 +22,7 @@ public class SirenHelper {
     }
 
     protected static int getDaysSinceLastCheck(Context context) {
-        long lastCheckTimestamp = PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
+        long lastCheckTimestamp = getLastVerificationDate(context);
 
         if (lastCheckTimestamp > 0) {
             return (int) (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTimeInMillis()) - TimeUnit.MILLISECONDS.toDays(lastCheckTimestamp));
@@ -52,7 +52,11 @@ public class SirenHelper {
                 .commit();
     }
 
-    public static String getAlertMessage(Context context, String minAppVersion) {
+    protected static long getLastVerificationDate(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
+    }
+
+    protected static String getAlertMessage(Context context, String minAppVersion) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
                 return context.getString(R.string.update_alert_message, context.getString(context.getApplicationInfo().labelRes), minAppVersion);
@@ -65,7 +69,7 @@ public class SirenHelper {
         }
     }
 
-    public static void openGooglePlay(Activity activity) {
+    protected static void openGooglePlay(Activity activity) {
         final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -74,13 +78,13 @@ public class SirenHelper {
         }
     }
 
-    public static void setVersionSkippedByUser(Context context, String skippedVersion) {
+    protected static void setVersionSkippedByUser(Context context, String skippedVersion) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(Constants.PREFERENCES_SKIPPED_VERSION, skippedVersion)
                 .commit();
     }
 
-    public static String getVersionName(Context context) {
+    protected static String getVersionName(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
             return pInfo.versionName;
@@ -90,7 +94,7 @@ public class SirenHelper {
         }
     }
 
-    public static boolean isGreater(String first, String second) {
+    protected static boolean isGreater(String first, String second) {
         if (TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second)) {
             return Integer.parseInt(first) > Integer.parseInt(second);
         }

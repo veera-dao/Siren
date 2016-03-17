@@ -84,13 +84,14 @@ public class Siren {
         mActivityRef = new WeakReference<Activity>(activity);
 
         if (TextUtils.isEmpty(appDescriptionUrl)) {
-            Log.e(getClass().getSimpleName(), "Please make sure your set correct path to app version description document");
+            Log.e(getClass().getSimpleName(), "Please make sure you set correct path to app version description document");
             return;
         }
 
         if (versionCheckType == SirenVersionCheckType.IMMEDIATELY) {
             performVersionCheck(appDescriptionUrl);
-        } else if (versionCheckType.getValue() <= SirenHelper.getDaysSinceLastCheck(mApplicationContext)) {
+        } else if (versionCheckType.getValue() <= SirenHelper.getDaysSinceLastCheck(mApplicationContext)
+                ||SirenHelper.getLastVerificationDate(mApplicationContext) == 0) {
             performVersionCheck(appDescriptionUrl);
         }
     }
