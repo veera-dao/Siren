@@ -18,21 +18,29 @@ import java.net.URL;
 
 /**
  * Created by yuriy on 09.03.2016.
- */
-public class Siren {
-    /**JSON format should be the following
-     * {
-     *     "com.example.app": {
-     *         "minVersionCode": 7,
-     *         "minVersionName": "1.0.0.0"
-     *     }
-     * }
-     */
 
-    private static Siren ourInstance = new Siren();
-    private ISirenListener sirenListener;
-    private Context context;
-    private WeakReference<Activity> activityRef;
+ *JSON format should be the following
+ * {
+ *     "com.example.app": {
+ *         "minVersionName": "1.0.0.0"
+ *     }
+ * }
+ *
+ * OR
+ *
+ * {
+ *     "com.example.app": {
+ *         "minVersionCode": 7,
+ *     }
+ * }
+ */
+
+public class Siren {
+
+    private static Siren sirenInstance = new Siren();
+    private ISirenListener mSirenListener;
+    private Context mApplicationContext;
+    private WeakReference<Activity> mActivityRef;
 
     /**
      * Determines alert type during version code verification
@@ -60,12 +68,12 @@ public class Siren {
     private SirenAlertType revisionUpdateAlertType = SirenAlertType.OPTION;
 
     /**
-     * @param context - you should use an Application context here in order to not cause memory leaks
+     * @param context - you should use an Application mApplicationContext here in order to not cause memory leaks
      * @return
      */
     public static Siren getInstance(Context context) {
-        ourInstance.context = context;
-        return ourInstance;
+        sirenInstance.mApplicationContext = context;
+        return sirenInstance;
     }
 
     private Siren() {
@@ -73,7 +81,7 @@ public class Siren {
 
     public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl) {
 
-        activityRef = new WeakReference<Activity>(activity);
+        mActivityRef = new WeakReference<Activity>(activity);
 
         if (TextUtils.isEmpty(appDescriptionUrl)) {
             Log.e(getClass().getSimpleName(), "Please make sure your set correct path to app version description document");
@@ -82,7 +90,7 @@ public class Siren {
 
         if (versionCheckType == SirenVersionCheckType.IMMEDIATELY) {
             performVersionCheck(appDescriptionUrl);
-        } else if (versionCheckType.getValue() <= SirenHelper.getDaysSinceLastCheck(context)) {
+        } else if (versionCheckType.getValue() <= SirenHelper.getDaysSinceLastCheck(mApplicationContext)) {
             performVersionCheck(appDescriptionUrl);
         }
     }
@@ -95,10 +103,10 @@ public class Siren {
         try {
             JSONObject rootJson = new JSONObject(json);
 
-            if (!rootJson.isNull(SirenHelper.getPackageName(context))) {
-                JSONObject appJson = rootJson.getJSONObject(SirenHelper.getPackageName(context));
+            if (!rootJson.isNull(SirenHelper.getPackageName(mApplicationContext))) {
+                JSONObject appJson = rootJson.getJSONObject(SirenHelper.getPackageName(mApplicationContext));
 
-                //version name have higher priority
+                //version name have higher priority then version code
                 if (checkVersionName(appJson)) {
                     return;
                 }
@@ -111,8 +119,8 @@ public class Siren {
 
         } catch (JSONException e) {
             e.printStackTrace();
-            if (sirenListener != null) {
-                sirenListener.onError(e);
+            if (mSirenListener != null) {
+                mSirenListener.onError(e);
             }
         }
     }
@@ -121,14 +129,14 @@ public class Siren {
         if (!appJson.isNull(Constants.JSON_MIN_VERSION_NAME)) {
 
             //save last successful verification date
-            SirenHelper.setLastVerificationDate(context);
+            SirenHelper.setLastVerificationDate(mApplicationContext);
 
             String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
-            String currentVersionName = SirenHelper.getVersionName(context);
+            String currentVersionName = SirenHelper.getVersionName(mApplicationContext);
 
             SirenAlertType alertType = null;
             if (!TextUtils.isEmpty(minVersionName) && !TextUtils.isEmpty(currentVersionName)
-                    && !SirenHelper.isVersionSkippedByUser(context, minVersionName)) {
+                    && !SirenHelper.isVersionSkippedByUser(mApplicationContext, minVersionName)) {
                 String[] minVersionNumbers = minVersionName.split("\\.");
                 String[] currentVersionNumbers = currentVersionName.split("\\.");
                 if (minVersionNumbers != null && currentVersionNumbers != null
@@ -159,10 +167,10 @@ public class Siren {
             int minAppVersionCode = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
 
             //save last successful verification date
-            SirenHelper.setLastVerificationDate(context);
+            SirenHelper.setLastVerificationDate(mApplicationContext);
 
-            if (SirenHelper.getVersionCode(context) < minAppVersionCode
-                    && !SirenHelper.isVersionSkippedByUser(context, String.valueOf(minAppVersionCode))) {
+            if (SirenHelper.getVersionCode(mApplicationContext) < minAppVersionCode
+                    && !SirenHelper.isVersionSkippedByUser(mApplicationContext, String.valueOf(minAppVersionCode))) {
                 showAlert(String.valueOf(minAppVersionCode), versionCodeUpdateAlertType);
                 return true;
             }
@@ -172,11 +180,11 @@ public class Siren {
 
     private void showAlert(String appVersion, SirenAlertType alertType) {
         if (versionCodeUpdateAlertType == SirenAlertType.NONE) {
-            if (sirenListener != null) {
-                sirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(context, appVersion));
+            if (mSirenListener != null) {
+                mSirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(mApplicationContext, appVersion));
             }
         } else {
-            new SirenAlertWrapper(activityRef.get(), sirenListener, alertType, appVersion).show();
+            new SirenAlertWrapper(mActivityRef.get(), mSirenListener, alertType, appVersion).show();
         }
     }
 
@@ -197,7 +205,7 @@ public class Siren {
     }
 
     public void setSirenListener(ISirenListener sirenListener) {
-        this.sirenListener = sirenListener;
+        this.mSirenListener = sirenListener;
     }
 
     public void setVersionCodeUpdateAlertType(SirenAlertType versionCodeUpdateAlertType) {
@@ -240,8 +248,8 @@ public class Siren {
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                if (Siren.ourInstance.sirenListener != null) {
-                    Siren.ourInstance.sirenListener.onError(ex);
+                if (Siren.sirenInstance.mSirenListener != null) {
+                    Siren.sirenInstance.mSirenListener.onError(ex);
                 }
 
             } finally {
@@ -250,8 +258,8 @@ public class Siren {
                         connection.disconnect();
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        if (Siren.ourInstance.sirenListener != null) {
-                            Siren.ourInstance.sirenListener.onError(ex);
+                        if (Siren.sirenInstance.mSirenListener != null) {
+                            Siren.sirenInstance.mSirenListener.onError(ex);
                         }
                     }
                 }
@@ -262,10 +270,10 @@ public class Siren {
         @Override
         protected void onPostExecute(String result) {
             if (!TextUtils.isEmpty(result)) {
-                Siren.ourInstance.handleVerificationResults(result);
+                Siren.sirenInstance.handleVerificationResults(result);
             } else {
-                if (Siren.ourInstance.sirenListener != null) {
-                    Siren.ourInstance.sirenListener.onError(new NullPointerException());
+                if (Siren.sirenInstance.mSirenListener != null) {
+                    Siren.sirenInstance.mSirenListener.onError(new NullPointerException());
                 }
             }
         }

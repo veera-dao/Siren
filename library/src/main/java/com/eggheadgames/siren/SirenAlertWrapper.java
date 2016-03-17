@@ -13,42 +13,42 @@ import java.lang.ref.WeakReference;
  */
 public class SirenAlertWrapper {
 
-    WeakReference<Activity> activityRef;
-    private int theme;
-    private ISirenListener sirenListener;
-    private SirenAlertType sirenAlertType;
-    private String minAppVersion;
+    WeakReference<Activity> mActivityRef;
+    private int mTheme;
+    private ISirenListener mSirenListener;
+    private SirenAlertType mSirenAlertType;
+    private String mMinAppVersion;
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion) {
-        this.sirenListener = sirenListener;
-        this.sirenAlertType = sirenAlertType;
-        this.minAppVersion = minAppVersion;
-        activityRef = new WeakReference<Activity>(activity);
+        this.mSirenListener = sirenListener;
+        this.mSirenAlertType = sirenAlertType;
+        this.mMinAppVersion = minAppVersion;
+        mActivityRef = new WeakReference<Activity>(activity);
     }
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, int theme) {
         this(activity, sirenListener, sirenAlertType, minAppVersion);
-        this.theme = theme;
+        this.mTheme = theme;
     }
 
     public void show() {
-        if (activityRef.get() != null) {
+        if (mActivityRef.get() != null) {
             Dialog dialog;
-            if (theme > 0) {
-                dialog = new Dialog(activityRef.get(), theme);
+            if (mTheme > 0) {
+                dialog = new Dialog(mActivityRef.get(), mTheme);
             } else {
-                dialog = new Dialog(activityRef.get());
+                dialog = new Dialog(mActivityRef.get());
             }
             setupDialog(dialog);
             dialog.setCancelable(false);
             dialog.show();
 
-            sirenListener.onShowUpdateDialog();
+            mSirenListener.onShowUpdateDialog();
 
 
         } else {
-            if (sirenListener != null) {
-                sirenListener.onError(new NullPointerException("activity reference is null"));
+            if (mSirenListener != null) {
+                mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
         }
     }
@@ -61,46 +61,46 @@ public class SirenAlertWrapper {
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
         final Button skip = (Button) dialog.findViewById(R.id.btnSirenSkip);
 
-        message.setText(SirenHelper.getAlertMessage(activityRef.get(), minAppVersion));
+        message.setText(SirenHelper.getAlertMessage(mActivityRef.get(), mMinAppVersion));
 
-        if (sirenAlertType == SirenAlertType.FORCE
-                || sirenAlertType == SirenAlertType.OPTION
-                || sirenAlertType == SirenAlertType.SKIP) {
+        if (mSirenAlertType == SirenAlertType.FORCE
+                || mSirenAlertType == SirenAlertType.OPTION
+                || mSirenAlertType == SirenAlertType.SKIP) {
             update.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (sirenListener != null) {
-                        sirenListener.onLaunchGooglePlay();
+                    if (mSirenListener != null) {
+                        mSirenListener.onLaunchGooglePlay();
                     }
                     dialog.dismiss();
-                    SirenHelper.openGooglePlay(activityRef.get());
+                    SirenHelper.openGooglePlay(mActivityRef.get());
                 }
             });
         }
 
-        if (sirenAlertType == SirenAlertType.OPTION
-                || sirenAlertType == SirenAlertType.SKIP) {
+        if (mSirenAlertType == SirenAlertType.OPTION
+                || mSirenAlertType == SirenAlertType.SKIP) {
             nextTime.setVisibility(View.VISIBLE);
             nextTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(sirenListener != null) {
-                        sirenListener.onCancel();
+                    if(mSirenListener != null) {
+                        mSirenListener.onCancel();
                     }
                     dialog.dismiss();
                 }
             });
         }
-        if (sirenAlertType == SirenAlertType.SKIP) {
+        if (mSirenAlertType == SirenAlertType.SKIP) {
             skip.setVisibility(View.VISIBLE);
             skip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (sirenListener != null) {
-                        sirenListener.onSkipVersion();
+                    if (mSirenListener != null) {
+                        mSirenListener.onSkipVersion();
                     }
 
-                    SirenHelper.setVersionSkippedByUser(activityRef.get(), minAppVersion);
+                    SirenHelper.setVersionSkippedByUser(mActivityRef.get(), mMinAppVersion);
                     dialog.dismiss();
                 }
             });
