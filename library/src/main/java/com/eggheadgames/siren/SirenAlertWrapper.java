@@ -43,7 +43,9 @@ public class SirenAlertWrapper {
             dialog.setCancelable(false);
             dialog.show();
 
-            mSirenListener.onShowUpdateDialog();
+            if (mSirenListener != null) {
+                mSirenListener.onShowUpdateDialog();
+            }
 
 
         } else {

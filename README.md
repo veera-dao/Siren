@@ -42,20 +42,22 @@ Add dependepcy to your application related build.gradle
 
 ```gradle
 dependencies {
-    compile 'com.github.eggheadgames:Siren:1.1.0'
+    compile 'com.github.eggheadgames:Siren:1.2.0'
 }
 ```
 
 Host a Json document with a public access that will describe your application package name and current application version.
 
-```{
+```
+{
     "com.example.app": {
         "minVersionName": "1.0.0.0"
     }
 }
 ```
 OR
-```{
+```
+{
     "com.example.app": {
         "minVersionCode": 7,
     }
