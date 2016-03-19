@@ -1,8 +1,6 @@
 package com.eggheadgames.siren;
 
 /**
- * Created by yuriy on 09.03.2016.
- *
  * Determines the frequency in which the the version check is performed
  */
 public enum SirenVersionCheckType {
@@ -11,7 +9,7 @@ public enum SirenVersionCheckType {
     DAILY(1),          // Version check performed once a day
     WEEKLY(7);         // Version check performed once a week
 
-    private int value;
+    private final int value;
 
     SirenVersionCheckType(int value) {
         this.value = value;

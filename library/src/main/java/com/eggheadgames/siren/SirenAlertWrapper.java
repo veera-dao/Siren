@@ -8,22 +8,19 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
-/**
- * Created by yuriy on 10.03.2016.
- */
 public class SirenAlertWrapper {
 
-    WeakReference<Activity> mActivityRef;
+    final WeakReference<Activity> mActivityRef;
+    private final ISirenListener mSirenListener;
+    private final SirenAlertType mSirenAlertType;
+    private final String mMinAppVersion;
     private int mTheme;
-    private ISirenListener mSirenListener;
-    private SirenAlertType mSirenAlertType;
-    private String mMinAppVersion;
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion) {
         this.mSirenListener = sirenListener;
         this.mSirenAlertType = sirenAlertType;
         this.mMinAppVersion = minAppVersion;
-        mActivityRef = new WeakReference<Activity>(activity);
+        mActivityRef = new WeakReference<>(activity);
     }
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, int theme) {

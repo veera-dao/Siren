@@ -1,8 +1,5 @@
 package com.eggheadgames.siren;
 
-/**
- * Created by yuriy on 09.03.2016.
- */
 public interface ISirenListener {
 
     public void onShowUpdateDialog();                       // User presented with update dialog

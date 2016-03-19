@@ -37,7 +37,7 @@ import java.net.URL;
 
 public class Siren {
 
-    private static Siren sirenInstance = new Siren();
+    private static final Siren sirenInstance = new Siren();
     private ISirenListener mSirenListener;
     private Context mApplicationContext;
     private WeakReference<Activity> mActivityRef;
@@ -81,7 +81,7 @@ public class Siren {
 
     public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl) {
 
-        mActivityRef = new WeakReference<Activity>(activity);
+        mActivityRef = new WeakReference<>(activity);
 
         if (TextUtils.isEmpty(appDescriptionUrl)) {
             Log.e(getClass().getSimpleName(), "Please make sure you set correct path to app version description document");
@@ -241,7 +241,7 @@ public class Siren {
                                 connection.disconnect();
                                 return null;
                             }
-                            sb.append(line+"\n");
+                            sb.append(line).append("\n");
                         }
                         br.close();
                         return sb.toString();

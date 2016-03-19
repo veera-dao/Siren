@@ -12,10 +12,7 @@ import android.text.TextUtils;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by yuriy on 10.03.2016.
- */
-public class SirenHelper {
+class SirenHelper {
 
     protected static String getPackageName(Context context) {
         return context.getPackageName();
@@ -41,6 +38,7 @@ public class SirenHelper {
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected static boolean isVersionSkippedByUser(Context context, String minAppVersion) {
         String skippedVersion = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PREFERENCES_SKIPPED_VERSION, "");
         return skippedVersion.equals(minAppVersion);

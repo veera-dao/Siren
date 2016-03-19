@@ -2,7 +2,9 @@
 
 # Siren for Android
 
-Notify users when a new version of your Android app is available, and prompt them with the Play Store link. This is a port of the iOS library of the same name: https://github.com/ArtSabintsev/Siren
+### Notify users when a new version of your Android app is available, and prompt them with the Play Store link. 
+
+This is a port of the iOS library of the same name: https://github.com/ArtSabintsev/Siren
 
 ## About
 
@@ -24,12 +26,21 @@ If a new version is available, an alert can be presented to the user informing t
 - [x] Optional override methods (see **Optional Override** section)
 - [x] Accompanying sample Android app
 
-## Etc...
+## Setup
 
-This is a work in progress...  It began March 9 2016 and is in active development.
+A minimal usage is to add the following to the `onCreate` of your main activity. 
+This will check at most once a day for a new version and give the user the option to choose "Update" or "Next time".
+```java
 
-## How to use
-Add JitPack.io repository to your root build.gradle:
+private static final String SIREN_JSON_URL = "https://example.com/com.mycompany.myapp/version.json";
+
+Siren siren = Siren.getInstance(getApplicationContext());
+siren.checkVersion(this, SirenVersionCheckType.DAILY, SIREN_JSON_URL);
+```
+
+## Installation Instructions
+Add the JitPack.io repository to your root `build.gradle`:
+
 ```gradle
 allprojects {
     repositories {
@@ -38,40 +49,89 @@ allprojects {
 }
 ```
 
-Add dependepcy to your application related build.gradle
+Add a dependepcy to your application related `build.gradle`
 
 ```gradle
 dependencies {
-    compile 'com.github.eggheadgames:Siren:1.2.0'
+    compile 'com.github.eggheadgames:Siren:1.2.1'
 }
 ```
 
 Host a Json document with a public access that will describe your application package name and current application version.
 
-```
+```json
 {
-    "com.example.app": {
-        "minVersionName": "1.0.0.0"
-    }
+    "com.example.app": { "minVersionName": "1.3.2" }
 }
 ```
 OR
-```
+```json
 {
-    "com.example.app": {
-        "minVersionCode": 7,
-    }
+    "com.example.app": { "minVersionCode": 7 }
 }
 ```
 
-Get instance of Siren class and perform version verification by calling
-```
-public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl)
-```
-Depending on **SirenVersionCheckType** that you choose, verification will be performed in the following way:
+## Full Example
 
-**IMMEDIATELY**     Version check performed every time the app is launched
-**DAILY**           Version check performed once a day
-**WEEKLY**          Version check performed once a week
+Some developers may want to display a less obtrusive custom interface, like a banner or small icon. 
+You may also wish to control which level of update to force a user to update vs deferring to later.
 
-You can also define dialog appearance and behaviour by setting **SirenAlertType** as a reaction to every digit in Semantic Versioning System 
+You can find a fully functional sample project at https://github.com/eggheadgames/SirenSample.
+
+Here is a code sample that shows the full features available:
+
+```java
+    private void checkCurrentAppVersion() {
+        Siren siren = Siren.getInstance(getApplicationContext());
+        siren.setSirenListener(sirenListener);
+        siren.setMajorUpdateAlertType(SirenAlertType.FORCE);
+        siren.setMinorUpdateAlertType(SirenAlertType.OPTION);
+        siren.setPatchUpdateAlertType(SirenAlertType.SKIP);
+        siren.setRevisionUpdateAlertType(SirenAlertType.NONE);
+        siren.setVersionCodeUpdateAlertType(SirenAlertType.SKIP);
+        siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, SIREN_JSON_DOCUMENT_URL);
+    }
+
+    ISirenListener sirenListener = new ISirenListener() {
+        @Override
+        public void onShowUpdateDialog() {
+            Log.d(TAG, "onShowUpdateDialog");
+        }
+
+        @Override
+        public void onLaunchGooglePlay() {
+            Log.d(TAG, "onLaunchGooglePlay");
+        }
+
+        @Override
+        public void onSkipVersion() {
+            Log.d(TAG, "onSkipVersion");
+        }
+
+        @Override
+        public void onCancel() {
+            Log.d(TAG, "onCancel");
+        }
+
+        @Override
+        public void onDetectNewVersionWithoutAlert(String message) {
+            Log.d(TAG, "onDetectNewVersionWithoutAlert: " + message);
+        }
+
+        @Override
+        public void onError(Exception e) {
+            Log.d(TAG, "onError");
+            e.printStackTrace();
+        }
+    };
+```
+
+
+The **SirenVersionCheckType** that you choose changes the check frequency as follows:
+
+ * **IMMEDIATELY**     every time the app is launched
+ * **DAILY**           once a day
+ * **WEEKLY**          once a week
+
+You can also define the dialog appearance and behaviour by setting **SirenAlertType** to react according to your version increment per [Semantic Versioning](http://semver.org/).
+
