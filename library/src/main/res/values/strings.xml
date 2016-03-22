@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Siren</string>
     <string name="fallback_app_name">application</string>
-    
+
     <string name="update_alert_message" formatted="false">A new version of %s is available. Please update to version %s now.</string>
     <string name="update_available">Update available</string>
     <string name="update">Update</string>

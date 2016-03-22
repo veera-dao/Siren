@@ -5,11 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 class SirenHelper {
@@ -54,18 +59,38 @@ class SirenHelper {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
     }
 
-    protected static String getAlertMessage(Context context, String minAppVersion) {
+    protected static String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
-                return context.getString(R.string.update_alert_message, context.getString(context.getApplicationInfo().labelRes), minAppVersion);
+                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
             } else {
-                return context.getString(R.string.update_alert_message, context.getString(R.string.fallback_app_name), minAppVersion);
+                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, R.string.fallback_app_name, locale), minAppVersion);
             }
         } catch (Exception e) {
             e.printStackTrace();
             return context.getString(R.string.update_alert_message, context.getString(R.string.fallback_app_name), minAppVersion);
         }
     }
+
+    protected static String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
+        if (locale == null) {
+            return context.getString(stringResource);
+        } else {
+            Resources standardResources = context.getResources();
+            AssetManager assets = standardResources.getAssets();
+            DisplayMetrics metrics = standardResources.getDisplayMetrics();
+            Configuration defaultConfiguration = standardResources.getConfiguration();
+            Configuration newConfiguration = new Configuration(defaultConfiguration);
+            newConfiguration.locale = new Locale(locale.getLocale());
+            String string = new Resources(assets, metrics, newConfiguration).getString(stringResource);
+
+            //need to turn back the default locale
+            new Resources(assets, metrics, defaultConfiguration);
+            return string;
+
+        }
+    }
+
 
     protected static void openGooglePlay(Activity activity) {
         final String appPackageName = getPackageName(activity);

@@ -68,8 +68,11 @@ public class Siren {
     private SirenAlertType revisionUpdateAlertType = SirenAlertType.OPTION;
 
     /**
+     Overrides the default localization of a user's device when presenting the update message and button titles in the alert.
+     */
+    private SirenSupportedLocales forceLanguageLocalization = null;
+    /**
      * @param context - you should use an Application mApplicationContext here in order to not cause memory leaks
-     * @return
      */
     public static Siren getInstance(Context context) {
         sirenInstance.mApplicationContext = context;
@@ -182,10 +185,10 @@ public class Siren {
     private void showAlert(String appVersion, SirenAlertType alertType) {
         if (versionCodeUpdateAlertType == SirenAlertType.NONE) {
             if (mSirenListener != null) {
-                mSirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(mApplicationContext, appVersion));
+                mSirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(mApplicationContext, appVersion, forceLanguageLocalization));
             }
         } else {
-            new SirenAlertWrapper(mActivityRef.get(), mSirenListener, alertType, appVersion).show();
+            new SirenAlertWrapper(mActivityRef.get(), mSirenListener, alertType, appVersion, forceLanguageLocalization).show();
         }
     }
 
@@ -211,6 +214,10 @@ public class Siren {
 
     public void setVersionCodeUpdateAlertType(SirenAlertType versionCodeUpdateAlertType) {
         this.versionCodeUpdateAlertType = versionCodeUpdateAlertType;
+    }
+
+    public void setLanguageLocalization(SirenSupportedLocales localization) {
+        forceLanguageLocalization = localization;
     }
 
     public static class LoadJsonTask extends AsyncTask<String, Void, String> {

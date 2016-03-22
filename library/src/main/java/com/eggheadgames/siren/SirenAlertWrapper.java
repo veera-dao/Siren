@@ -14,17 +14,19 @@ public class SirenAlertWrapper {
     private final ISirenListener mSirenListener;
     private final SirenAlertType mSirenAlertType;
     private final String mMinAppVersion;
+    private final SirenSupportedLocales mLocale;
     private int mTheme;
 
-    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion) {
+    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, SirenSupportedLocales locale) {
         this.mSirenListener = sirenListener;
         this.mSirenAlertType = sirenAlertType;
         this.mMinAppVersion = minAppVersion;
+        this.mLocale = locale;
         mActivityRef = new WeakReference<>(activity);
     }
 
-    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, int theme) {
-        this(activity, sirenListener, sirenAlertType, minAppVersion);
+    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType, String minAppVersion, SirenSupportedLocales locale, int theme) {
+        this(activity, sirenListener, sirenAlertType, minAppVersion, locale);
         this.mTheme = theme;
     }
 
@@ -53,14 +55,18 @@ public class SirenAlertWrapper {
     }
 
     private void setupDialog(final Dialog dialog) {
-        dialog.setTitle(R.string.update_available);
+        dialog.setTitle(SirenHelper.getLocalizedString(mActivityRef.get(), R.string.update_available, mLocale));
         dialog.setContentView(R.layout.siren_dialog);
         TextView message = (TextView) dialog.findViewById(R.id.tvSirenAlertMessage);
         Button update = (Button) dialog.findViewById(R.id.btnSirenUpdate);
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
         final Button skip = (Button) dialog.findViewById(R.id.btnSirenSkip);
 
-        message.setText(SirenHelper.getAlertMessage(mActivityRef.get(), mMinAppVersion));
+        update.setText(SirenHelper.getLocalizedString(mActivityRef.get(), R.string.update, mLocale));
+        nextTime.setText(SirenHelper.getLocalizedString(mActivityRef.get(), R.string.next_time, mLocale));
+        skip.setText(SirenHelper.getLocalizedString(mActivityRef.get(), R.string.skip_this_version, mLocale));
+
+        message.setText(SirenHelper.getAlertMessage(mActivityRef.get(), mMinAppVersion, mLocale));
 
         if (mSirenAlertType == SirenAlertType.FORCE
                 || mSirenAlertType == SirenAlertType.OPTION
