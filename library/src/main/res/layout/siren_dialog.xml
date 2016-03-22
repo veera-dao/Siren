@@ -22,15 +22,6 @@
         android:layout_marginTop="20dp">
 
         <Button
-            android:id="@+id/btnSirenUpdate"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginLeft="@dimen/half_margin"
-            android:layout_marginRight="@dimen/half_margin"
-            android:layout_weight="1"
-            android:text="@string/update" />
-
-        <Button
             android:id="@+id/btnSirenNextTime"
             android:layout_width="0dp"
             android:layout_height="@dimen/button_height"
@@ -39,6 +30,16 @@
             android:layout_weight="1"
             android:text="@string/next_time"
             android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnSirenUpdate"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginLeft="@dimen/half_margin"
+            android:layout_marginRight="@dimen/half_margin"
+            android:layout_weight="1"
+            android:text="@string/update" />
+
 
     </LinearLayout>
     <Button
