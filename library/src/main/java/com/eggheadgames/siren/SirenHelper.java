@@ -10,20 +10,32 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 class SirenHelper {
+    private static final SirenHelper instance = new SirenHelper();
 
-    protected static String getPackageName(Context context) {
+    public static SirenHelper getInstance() {
+        return instance;
+    }
+
+    @VisibleForTesting
+    protected SirenHelper() {
+    }
+
+
+    protected String getPackageName(Context context) {
         return context.getPackageName();
     }
 
-    protected static int getDaysSinceLastCheck(Context context) {
+    protected int getDaysSinceLastCheck(Context context) {
         long lastCheckTimestamp = getLastVerificationDate(context);
 
         if (lastCheckTimestamp > 0) {
@@ -33,7 +45,7 @@ class SirenHelper {
         }
     }
 
-    protected static int getVersionCode(Context context) {
+    protected int getVersionCode(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
             return pInfo.versionCode;
@@ -44,22 +56,22 @@ class SirenHelper {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    protected static boolean isVersionSkippedByUser(Context context, String minAppVersion) {
+    protected boolean isVersionSkippedByUser(Context context, String minAppVersion) {
         String skippedVersion = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PREFERENCES_SKIPPED_VERSION, "");
         return skippedVersion.equals(minAppVersion);
     }
 
-    protected static void setLastVerificationDate(Context context) {
+    protected void setLastVerificationDate(Context context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putLong(Constants.PREFERENCES_LAST_CHECK_DATE, Calendar.getInstance().getTimeInMillis())
                 .commit();
     }
 
-    protected static long getLastVerificationDate(Context context) {
+    protected long getLastVerificationDate(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
     }
 
-    protected static String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
+    protected String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
                 return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
@@ -72,7 +84,7 @@ class SirenHelper {
         }
     }
 
-    protected static String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
+    protected String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
         if (locale == null) {
             return context.getString(stringResource);
         } else {
@@ -92,7 +104,7 @@ class SirenHelper {
     }
 
 
-    protected static void openGooglePlay(Activity activity) {
+    protected void openGooglePlay(Activity activity) {
         final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -101,13 +113,13 @@ class SirenHelper {
         }
     }
 
-    protected static void setVersionSkippedByUser(Context context, String skippedVersion) {
+    protected void setVersionSkippedByUser(Context context, String skippedVersion) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(Constants.PREFERENCES_SKIPPED_VERSION, skippedVersion)
                 .commit();
     }
 
-    protected static String getVersionName(Context context) {
+    protected String getVersionName(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
             return pInfo.versionName;
@@ -117,10 +129,18 @@ class SirenHelper {
         }
     }
 
-    protected static boolean isGreater(String first, String second) {
+    protected boolean isGreater(String first, String second) {
         if (TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second)) {
             return Integer.parseInt(first) > Integer.parseInt(second);
         }
         return false;
+    }
+
+    protected boolean isEmpty(String appDescriptionUrl) {
+        return TextUtils.isEmpty(appDescriptionUrl);
+    }
+
+    public void logError(String tag, String message) {
+        Log.d(tag, message);
     }
 }

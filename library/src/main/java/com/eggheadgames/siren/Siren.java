@@ -3,8 +3,7 @@ package com.eggheadgames.siren;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.text.TextUtils;
-import android.util.Log;
+import android.support.annotation.VisibleForTesting;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,9 +36,11 @@ import java.net.URL;
 
 public class Siren {
 
-    private static final Siren sirenInstance = new Siren();
+    @VisibleForTesting
+    protected static final Siren sirenInstance = new Siren();
+    @VisibleForTesting
+    protected Context mApplicationContext;
     private ISirenListener mSirenListener;
-    private Context mApplicationContext;
     private WeakReference<Activity> mActivityRef;
 
     /**
@@ -79,36 +80,39 @@ public class Siren {
         return sirenInstance;
     }
 
-    private Siren() {
+    @VisibleForTesting
+    protected Siren() {
     }
 
     public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl) {
 
         mActivityRef = new WeakReference<>(activity);
 
-        if (TextUtils.isEmpty(appDescriptionUrl)) {
-            Log.e(getClass().getSimpleName(), "Please make sure you set correct path to app version description document");
+        if (getSirenHelper().isEmpty(appDescriptionUrl)) {
+            getSirenHelper().logError(getClass().getSimpleName(), "Please make sure you set correct path to app version description document");
             return;
         }
 
         if (versionCheckType == SirenVersionCheckType.IMMEDIATELY) {
             performVersionCheck(appDescriptionUrl);
-        } else if (versionCheckType.getValue() <= SirenHelper.getDaysSinceLastCheck(mApplicationContext)
-                ||SirenHelper.getLastVerificationDate(mApplicationContext) == 0) {
+        } else if (versionCheckType.getValue() <= getSirenHelper().getDaysSinceLastCheck(mApplicationContext)
+                ||getSirenHelper().getLastVerificationDate(mApplicationContext) == 0) {
             performVersionCheck(appDescriptionUrl);
         }
     }
 
-    private void performVersionCheck(String appDescriptionUrl) {
+    @VisibleForTesting
+    protected void performVersionCheck(String appDescriptionUrl) {
         new LoadJsonTask().execute(appDescriptionUrl);
     }
 
+    @VisibleForTesting
     protected void handleVerificationResults(String json) {
         try {
             JSONObject rootJson = new JSONObject(json);
 
-            if (!rootJson.isNull(SirenHelper.getPackageName(mApplicationContext))) {
-                JSONObject appJson = rootJson.getJSONObject(SirenHelper.getPackageName(mApplicationContext));
+            if (!rootJson.isNull(getSirenHelper().getPackageName(mApplicationContext))) {
+                JSONObject appJson = rootJson.getJSONObject(getSirenHelper().getPackageName(mApplicationContext));
 
                 //version name have higher priority then version code
                 if (checkVersionName(appJson)) {
@@ -129,29 +133,39 @@ public class Siren {
         }
     }
 
+    @VisibleForTesting
+    protected SirenAlertWrapper getAlertWrapper(SirenAlertType alertType, String appVersion) {
+        Activity activity = mActivityRef.get();
+        return new SirenAlertWrapper(activity, mSirenListener, alertType, appVersion, forceLanguageLocalization, getSirenHelper());
+    }
+
+    protected SirenHelper getSirenHelper() {
+        return SirenHelper.getInstance();
+    }
+
     private boolean checkVersionName(JSONObject appJson) throws JSONException{
         if (!appJson.isNull(Constants.JSON_MIN_VERSION_NAME)) {
 
             //save last successful verification date
-            SirenHelper.setLastVerificationDate(mApplicationContext);
+            getSirenHelper().setLastVerificationDate(mApplicationContext);
 
             String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
-            String currentVersionName = SirenHelper.getVersionName(mApplicationContext);
+            String currentVersionName = getSirenHelper().getVersionName(mApplicationContext);
 
             SirenAlertType alertType = null;
-            if (!TextUtils.isEmpty(minVersionName) && !TextUtils.isEmpty(currentVersionName)
-                    && !SirenHelper.isVersionSkippedByUser(mApplicationContext, minVersionName)) {
+            if (!getSirenHelper().isEmpty(minVersionName) && !getSirenHelper().isEmpty(currentVersionName)
+                    && !getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName)) {
                 String[] minVersionNumbers = minVersionName.split("\\.");
                 String[] currentVersionNumbers = currentVersionName.split("\\.");
                 if (minVersionNumbers != null && currentVersionNumbers != null
                         && minVersionNumbers.length == currentVersionNumbers.length) {
-                    if (minVersionNumbers.length > 0 && SirenHelper.isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
+                    if (minVersionNumbers.length > 0 && getSirenHelper().isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
                         alertType = majorUpdateAlertType;
-                    } else if (minVersionNumbers.length > 1 && SirenHelper.isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
+                    } else if (minVersionNumbers.length > 1 && getSirenHelper().isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
                         alertType = minorUpdateAlertType;
-                    } else if (minVersionNumbers.length > 2 && SirenHelper.isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
+                    } else if (minVersionNumbers.length > 2 && getSirenHelper().isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
                         alertType = patchUpdateAlertType;
-                    } else if (minVersionNumbers.length > 3 && SirenHelper.isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
+                    } else if (minVersionNumbers.length > 3 && getSirenHelper().isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
                         alertType = revisionUpdateAlertType;
                     }
 
@@ -171,10 +185,10 @@ public class Siren {
             int minAppVersionCode = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
 
             //save last successful verification date
-            SirenHelper.setLastVerificationDate(mApplicationContext);
+            getSirenHelper().setLastVerificationDate(mApplicationContext);
 
-            if (SirenHelper.getVersionCode(mApplicationContext) < minAppVersionCode
-                    && !SirenHelper.isVersionSkippedByUser(mApplicationContext, String.valueOf(minAppVersionCode))) {
+            if (getSirenHelper().getVersionCode(mApplicationContext) < minAppVersionCode
+                    && !getSirenHelper().isVersionSkippedByUser(mApplicationContext, String.valueOf(minAppVersionCode))) {
                 showAlert(String.valueOf(minAppVersionCode), versionCodeUpdateAlertType);
                 return true;
             }
@@ -183,12 +197,12 @@ public class Siren {
     }
 
     private void showAlert(String appVersion, SirenAlertType alertType) {
-        if (versionCodeUpdateAlertType == SirenAlertType.NONE) {
+        if (alertType == SirenAlertType.NONE) {
             if (mSirenListener != null) {
-                mSirenListener.onDetectNewVersionWithoutAlert(SirenHelper.getAlertMessage(mApplicationContext, appVersion, forceLanguageLocalization));
+                mSirenListener.onDetectNewVersionWithoutAlert(getSirenHelper().getAlertMessage(mApplicationContext, appVersion, forceLanguageLocalization));
             }
         } else {
-            new SirenAlertWrapper(mActivityRef.get(), mSirenListener, alertType, appVersion, forceLanguageLocalization).show();
+            getAlertWrapper(alertType, appVersion).show();
         }
     }
 
@@ -277,7 +291,7 @@ public class Siren {
 
         @Override
         protected void onPostExecute(String result) {
-            if (!TextUtils.isEmpty(result)) {
+            if (!Siren.sirenInstance.getSirenHelper().isEmpty(result)) {
                 Siren.sirenInstance.handleVerificationResults(result);
             } else {
                 if (Siren.sirenInstance.mSirenListener != null) {
