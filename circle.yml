@@ -6,7 +6,7 @@ dependencies:
 test:
   override:
     # run lint (tests will come next ...)
-    - ./gradlew :app:check
+    - ./gradlew :library:check
 
     # copy results
-    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r library/build/outputs $CIRCLE_ARTIFACTS
