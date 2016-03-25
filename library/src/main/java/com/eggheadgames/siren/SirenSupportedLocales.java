@@ -1,5 +1,6 @@
 package com.eggheadgames.siren;
 
+@SuppressWarnings("unused")
 public enum SirenSupportedLocales {
     AR("ar"),
     DA("da"),
@@ -26,7 +27,7 @@ public enum SirenSupportedLocales {
     TH("th"),
     TR("tr");
 
-    private String locale;
+    private final String locale;
 
     SirenSupportedLocales(String locale) {
         this.locale = locale;

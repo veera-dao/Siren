@@ -1,5 +1,5 @@
-<resources>
-    <string name="update_alert_message" formatted="false">.نسخة جديدة من %s متوفرة. الرجاء التجديد إلى نسخة رقم %s الآن</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="update_alert_message" formatted="false" tools:ignore="StringFormatInvalid">.نسخة جديدة من %s متوفرة. الرجاء التجديد إلى نسخة رقم %s الآن</string>
     <string name="update_available">التجديد متوفر</string>
     <string name="update">تجديد</string>
     <string name="next_time">المرة التالية</string>

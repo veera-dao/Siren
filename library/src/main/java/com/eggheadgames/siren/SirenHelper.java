@@ -26,16 +26,17 @@ class SirenHelper {
         return instance;
     }
 
+    @SuppressWarnings("WeakerAccess")
     @VisibleForTesting
     protected SirenHelper() {
     }
 
 
-    protected String getPackageName(Context context) {
+    String getPackageName(Context context) {
         return context.getPackageName();
     }
 
-    protected int getDaysSinceLastCheck(Context context) {
+    int getDaysSinceLastCheck(Context context) {
         long lastCheckTimestamp = getLastVerificationDate(context);
 
         if (lastCheckTimestamp > 0) {
@@ -45,7 +46,7 @@ class SirenHelper {
         }
     }
 
-    protected int getVersionCode(Context context) {
+    int getVersionCode(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
             return pInfo.versionCode;
@@ -56,22 +57,22 @@ class SirenHelper {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    protected boolean isVersionSkippedByUser(Context context, String minAppVersion) {
+    boolean isVersionSkippedByUser(Context context, String minAppVersion) {
         String skippedVersion = PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PREFERENCES_SKIPPED_VERSION, "");
         return skippedVersion.equals(minAppVersion);
     }
 
-    protected void setLastVerificationDate(Context context) {
+    void setLastVerificationDate(Context context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putLong(Constants.PREFERENCES_LAST_CHECK_DATE, Calendar.getInstance().getTimeInMillis())
                 .commit();
     }
 
-    protected long getLastVerificationDate(Context context) {
+    long getLastVerificationDate(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
     }
 
-    protected String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
+    String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
                 return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
@@ -84,7 +85,7 @@ class SirenHelper {
         }
     }
 
-    protected String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
+    String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
         if (locale == null) {
             return context.getString(stringResource);
         } else {
@@ -104,22 +105,22 @@ class SirenHelper {
     }
 
 
-    protected void openGooglePlay(Activity activity) {
+    void openGooglePlay(Activity activity) {
         final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-        } catch (android.content.ActivityNotFoundException anfe) {
+        } catch (android.content.ActivityNotFoundException e) {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
     }
 
-    protected void setVersionSkippedByUser(Context context, String skippedVersion) {
+    void setVersionSkippedByUser(Context context, String skippedVersion) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putString(Constants.PREFERENCES_SKIPPED_VERSION, skippedVersion)
                 .commit();
     }
 
-    protected String getVersionName(Context context) {
+    String getVersionName(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
             return pInfo.versionName;
@@ -129,14 +130,11 @@ class SirenHelper {
         }
     }
 
-    protected boolean isGreater(String first, String second) {
-        if (TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second)) {
-            return Integer.parseInt(first) > Integer.parseInt(second);
-        }
-        return false;
+    boolean isGreater(String first, String second) {
+        return TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second) && Integer.parseInt(first) > Integer.parseInt(second);
     }
 
-    protected boolean isEmpty(String appDescriptionUrl) {
+    boolean isEmpty(String appDescriptionUrl) {
         return TextUtils.isEmpty(appDescriptionUrl);
     }
 

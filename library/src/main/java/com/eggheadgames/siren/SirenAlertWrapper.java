@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 public class SirenAlertWrapper {
 
-    final WeakReference<Activity> mActivityRef;
+    private final WeakReference<Activity> mActivityRef;
     private final ISirenListener mSirenListener;
     private final SirenAlertType mSirenAlertType;
     private final String mMinAppVersion;
@@ -28,6 +28,7 @@ public class SirenAlertWrapper {
         this.mActivityRef = new WeakReference<>(activity);
     }
 
+    @SuppressWarnings("unused")
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType,
                              String minAppVersion, SirenSupportedLocales locale, SirenHelper sirenHelper, int theme) {
         this(activity, sirenListener, sirenAlertType, minAppVersion, locale, sirenHelper);

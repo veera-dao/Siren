@@ -1,6 +1,6 @@
 package com.eggheadgames.siren;
 
-public interface Constants {
+interface Constants {
 
     String PREFERENCES_LAST_CHECK_DATE = "last_check_date";
     String PREFERENCES_SKIPPED_VERSION = "skipped_version";

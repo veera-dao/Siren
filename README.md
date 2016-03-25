@@ -49,7 +49,7 @@ allprojects {
 }
 ```
 
-Add a dependepcy to your application related `build.gradle`
+Add a dependency to your application related `build.gradle`
 
 ```gradle
 dependencies {

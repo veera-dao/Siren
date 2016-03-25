@@ -1,8 +1,6 @@
 package com.eggheadgames.siren;
 
 /**
- * Created by yuriy on 09.03.2016.
- *
  * Determines the type of alert to present after a successful version check has been performed.
  */
 public enum SirenAlertType {

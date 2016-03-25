@@ -1,8 +1,7 @@
-<resources>
-    <string name="app_name">Siren</string>
-    <string name="fallback_app_name">application</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="fallback_app_name" tools:ignore="MissingTranslation">application</string>
 
-    <string name="update_alert_message" formatted="false">A new version of %s is available. Please update to version %s now.</string>
+    <string name="update_alert_message" >A new version of %1$s is available. Please update to version %2$s now.</string>
     <string name="update_available">Update available</string>
     <string name="update">Update</string>
     <string name="next_time">Next time</string>

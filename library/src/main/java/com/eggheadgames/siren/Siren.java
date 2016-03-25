@@ -16,8 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by yuriy on 09.03.2016.
-
  *JSON format should be the following
  * {
  *     "com.example.app": {
@@ -34,6 +32,7 @@ import java.net.URL;
  * }
  */
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Siren {
 
     @VisibleForTesting
@@ -157,6 +156,7 @@ public class Siren {
                     && !getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName)) {
                 String[] minVersionNumbers = minVersionName.split("\\.");
                 String[] currentVersionNumbers = currentVersionName.split("\\.");
+                //noinspection ConstantConditions
                 if (minVersionNumbers != null && currentVersionNumbers != null
                         && minVersionNumbers.length == currentVersionNumbers.length) {
                     if (minVersionNumbers.length > 0 && getSirenHelper().isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
@@ -180,6 +180,7 @@ public class Siren {
         return false;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private boolean checkVersionCode(JSONObject appJson) throws JSONException{
         if (!appJson.isNull(Constants.JSON_MIN_VERSION_CODE)) {
             int minAppVersionCode = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
@@ -206,7 +207,7 @@ public class Siren {
         }
     }
 
-    public void setMajorUpdateAlertType(SirenAlertType majorUpdateAlertType) {
+    public void setMajorUpdateAlertType(@SuppressWarnings("SameParameterValue") SirenAlertType majorUpdateAlertType) {
         this.majorUpdateAlertType = majorUpdateAlertType;
     }
 

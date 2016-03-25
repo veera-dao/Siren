@@ -1,6 +1,6 @@
 package com.eggheadgames.siren;
 
-public interface TestConstants {
+interface TestConstants {
 
     String appVersionName = "1.1.1.1";
     int appVersionCode = 1;

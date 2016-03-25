@@ -22,9 +22,9 @@ public class SirenTest {
     @Mock
     SirenHelper sirenHelper;
 
-    SirenAlertWrapper alertWrapper;
-    Siren siren;
-    long lastCheckDate = 0;
+    private SirenAlertWrapper alertWrapper;
+    private Siren siren;
+    private long lastCheckDate = 0;
 
     @Before
     public void prepareTest() {
@@ -48,11 +48,7 @@ public class SirenTest {
         Mockito.when(sirenHelper.isEmpty(Mockito.anyString())).thenAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                if (invocation.getArguments()[0] != null && !invocation.getArguments()[0].equals("")) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return !(invocation.getArguments()[0] != null && !invocation.getArguments()[0].equals(""));
             }
         });
         Mockito.doAnswer(new Answer() {
@@ -305,7 +301,7 @@ public class SirenTest {
     }
 
     @Test
-    public void onVersionNameCountDismatch_verificationShouldBeSkipped() {
+    public void onVersionNameCountNotEquals_verificationShouldBeSkipped() {
         Mockito.when(sirenHelper.getVersionName(activity)).thenReturn("1.1.1");
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.never()).show();
