@@ -1,3 +1,4 @@
+[![Circle CI](https://circleci.com/gh/eggheadgames/Siren.svg?style=svg)](https://circleci.com/gh/eggheadgames/Siren)
 [![Release](https://jitpack.io/v/eggheadgames/Siren.svg)](https://jitpack.io/#eggheadgames/Siren)
 
 # Siren for Android
