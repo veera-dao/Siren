@@ -13,26 +13,35 @@ Siren checks a user's currently installed version of your Android app against th
 
 If a new version is available, an alert can be presented to the user informing them of the newer version, and giving them the option to update the application. Alternatively, Siren can notify your app programmatically, enabling you to inform the user through alternative means, such as a custom interface.
 
-* Siren is built to work with the Semantic Versioning system.
- * Semantic Versioning is a three number versioning system (e.g., 1.0.0)
- * Siren also supports two-number versioning (e.g., 1.0)
- * Siren also supports four-number versioning (e.g., 1.0.0.0)
-* Siren is a Java language port of a [Siren](https://github.com/ArtSabintsev/Siren), an iOS Swift library that achieves the same functionality.
-* Siren is actively maintained by [Egghead Games](http://eggheadgames.com)
+* Siren is built to work with semantic version numbering to provide a range of update suggestions for your customers
+* Siren is a Java language port of a [Siren](https://github.com/ArtSabintsev/Siren), an iOS Swift library that achieves the same functionality
+* Siren is actively maintained by [Egghead Games](http://eggheadgames.com) for their cross-platform mobile/tablet apps ([great mind puzzles with no ads](https://play.google.com/store/apps/dev?id=8905223606155014113)!)
 
 ## Features
 - [x] Gradle support (using [JitPack](https://jitpack.io/))
 - [x] Localized for 20+ languages (See **Localization** Section)
 - [x] Three types of alerts (see **Screenshots & Alert Types**)
 - [x] Optional override methods (see **Optional Override** section)
-- [x] Accompanying sample Android app
+- [x] Accompanying [sample Android app](https://github.com/eggheadgames/SirenSample/)
+
+## Screenshots & Alert Types
+
+- The **left picture** forces the user to update the app.
+- The **center picture** gives the user the option to update the app.
+- The **right picture** gives the user the option to skip the current update.
+- These options are controlled by the `SirenAlertType` enum.
+
+<img src="https://github.com/EggheadGames/Siren/blob/master/extras/forced.png?raw=true" height=480">
+<img src="https://github.com/EggheadGames/Siren/blob/master/extras/option.png?raw=true" height=480">
+<img src="https://github.com/EggheadGames/Siren/blob/master/extras/skip.png?raw=true" height=480">
+
 
 ## Setup
 
 A minimal usage is to add the following to the `onCreate` of your main activity. 
 This will check at most once a day for a new version and give the user the option to choose "Update" or "Next time".
-```java
 
+```java
 private static final String SIREN_JSON_URL = "https://example.com/com.mycompany.myapp/version.json";
 
 Siren siren = Siren.getInstance(getApplicationContext());
@@ -54,42 +63,60 @@ Add a dependency to your application related `build.gradle`
 
 ```gradle
 dependencies {
-    compile 'com.github.eggheadgames:Siren:1.2.1'
+    compile 'com.github.eggheadgames:Siren:1.4.2'
 }
 ```
 
 Host a Json document with a public access that will describe your application package name and current application version.
 
 ```json
-{
-    "com.example.app": { "minVersionName": "1.3.2" }
-}
+{ "com.example.app": { "minVersionName": "1.12.2" } }
 ```
 OR
 ```json
-{
-    "com.example.app": { "minVersionCode": 7 }
-}
+{ "com.example.app": { "minVersionCode": 7 } }
 ```
 
-## Full Example
+## Options
+
+The **SirenVersionCheckType** controls how often the server is checked for a new version, and hence how often the user will be prompted. You can set it to `IMMEDIATELY`, `DAILY` or `WEEKLY`.
+
+You can also define the dialog appearance and behaviour by setting **SirenAlertType** to react according to your version increment per [Semantic Versioning](http://semver.org/). The default is `SirenAlertType.OPTION`. This generates a 2 button "Next Time" or "Update" alert. Other values are `FORCE`, `SKIP` and `NONE`. `NONE` will not display an alert, but will call your listener with appropriate text to display. See **Example** below.
+
+You can combine these options to have different behaviour for different version changes. For example, you might will force a user to upgrade for a major version change (e.g. 1.x.x to 2.x.x), give them a "Next time" option for a minor version change (e.g. 1.2.x to 1.3.x) and add a 3rd "Skip this version" option for a 3rd or 4th level change (e.g. 1.2.5 to 1.2.6).  
+
+As well as the levels: Major, Minor, Patch and Revision, you can also set messages based on the `versionCode` of your app by using a `minVersionCode` field instead of `minVersionName`.
+
+The following code shows how you can display "stricter" dialogs based on the version severity, with no dialog displayed for a `versionCode` change:
+
+```java
+        Siren siren = Siren.getInstance(getApplicationContext());
+        siren.setMajorUpdateAlertType(SirenAlertType.FORCE);
+        siren.setMinorUpdateAlertType(SirenAlertType.OPTION);
+        siren.setPatchUpdateAlertType(SirenAlertType.SKIP);
+        siren.setRevisionUpdateAlertType(SirenAlertType.NONE);
+        siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, SIREN_JSON_DOCUMENT_URL);
+```
+
+
+## Example
 
 Some developers may want to display a less obtrusive custom interface, like a banner or small icon. 
 You may also wish to control which level of update to force a user to update vs deferring to later.
 
 You can find a fully functional sample project at https://github.com/eggheadgames/SirenSample.
 
-Here is a code sample that shows the full features available:
+Here is a code sample that shows how to handle all the alerts yourself:
 
 ```java
     private void checkCurrentAppVersion() {
         Siren siren = Siren.getInstance(getApplicationContext());
         siren.setSirenListener(sirenListener);
-        siren.setMajorUpdateAlertType(SirenAlertType.FORCE);
-        siren.setMinorUpdateAlertType(SirenAlertType.OPTION);
-        siren.setPatchUpdateAlertType(SirenAlertType.SKIP);
+        siren.setMajorUpdateAlertType(SirenAlertType.NONE);
+        siren.setMinorUpdateAlertType(SirenAlertType.NONE);
+        siren.setPatchUpdateAlertType(SirenAlertType.NONE);
         siren.setRevisionUpdateAlertType(SirenAlertType.NONE);
-        siren.setVersionCodeUpdateAlertType(SirenAlertType.SKIP);
+        siren.setVersionCodeUpdateAlertType(SirenAlertType.NONE);
         siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, SIREN_JSON_DOCUMENT_URL);
     }
 
@@ -127,12 +154,28 @@ Here is a code sample that shows the full features available:
     };
 ```
 
+## Localization
 
-The **SirenVersionCheckType** that you choose changes the check frequency as follows:
+Siren is localized for Arabic, Armenian, Basque, Chinese (Simplified), Chinese (Traditional), Danish, Dutch, English, Estonian, French, German, Hebrew, Hungarian, Italian, Japanese, Korean, Latvian, Lithuanian, Malay, Polish, Portuguese (Brazil), Portuguese (Portugal), Russian, Slovenian, Swedish, Spanish, Thai, and Turkish.
 
- * **IMMEDIATELY**     every time the app is launched
- * **DAILY**           once a day
- * **WEEKLY**          once a week
+You may want the update dialog to always appear in a certain language, ignoring Android's language setting. This is supported with the `setLanguageLocalization` method. For example, you can force a French update dialog by setting the locale as follows:
 
-You can also define the dialog appearance and behaviour by setting **SirenAlertType** to react according to your version increment per [Semantic Versioning](http://semver.org/).
+```java
+    Siren.setLanguageLocalization(SirenSupportedLocales.FR)
+```
+
+## Testing Siren
+
+Change the url in your app to point to a test location (e.g. http://myjson.com/ is a convenient test site). Create an appropriate file and run your app with the temporary url.  
+
+For example, if my app's current version is `2.1.0.0` and the `applicationId` is `com.eggheadgames.sirensample`, I could create a json file with contents:
+```json
+{"com.eggheadgames.sirensample":{"minVersionName":"2.2.1.1"}}
+```
+Then, add code like the following in the `onCreate()` of my app's home page:
+```java
+    private Siren siren = Siren.getInstance(getApplicationContext());
+    siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, "https://api.myjson.com/bins/198mf");
+```
+Running this should show an update dialog when I start the app.  Of course using a value other than `IMMEDIATELY` may not bring an immediate prompt, unless your `SharedPreferences` are being deleted between attempts.
 
