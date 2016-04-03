@@ -1,3 +1,4 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Siren-green.svg?style=true)](https://android-arsenal.com/details/1/3379)
 [![Circle CI](https://circleci.com/gh/eggheadgames/Siren.svg?style=svg)](https://circleci.com/gh/eggheadgames/Siren)
 [![Release](https://jitpack.io/v/eggheadgames/Siren.svg)](https://jitpack.io/#eggheadgames/Siren)
 
@@ -23,6 +24,10 @@ If a new version is available, an alert can be presented to the user informing t
 - [x] Three types of alerts (see **Screenshots & Alert Types**)
 - [x] Optional override methods (see **Optional Override** section)
 - [x] Accompanying [sample Android app](https://github.com/eggheadgames/SirenSample/)
+
+## Similar Android libraries
+
+Choose what works best for your scenario. We chose _not_ to "screenscrape" the Google Play Listing. We've kept the prompt & update scenarios simple. We kept close to the iOS Siren library to keep our iOS & Android apps similar. Other Android solutions: [AppUpdater](https://github.com/javiersantos/AppUpdater) (the most comprehensive and feature rich library, including support for checks at Amazon and FDroid), [Gandalf](https://github.com/btkelly/gandalf) (also has a "companion" iOS solution), [Update Checker](https://github.com/rampo/UpdateChecker), [Fit](https://github.com/KeithYokoma/Fit) (callback framework, no UI), 
 
 ## Screenshots & Alert Types
 
