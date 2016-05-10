@@ -12,6 +12,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import static org.mockito.Matchers.eq;
+
 @RunWith(MockitoJUnitRunner.class)
 public class SirenTest {
     private static final String APP_DESCRIPTION_URL = "http://example.com";
@@ -321,7 +323,7 @@ public class SirenTest {
         siren.setSirenListener(listener);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(listener, Mockito.times(1)).onError(Mockito.any(Exception.class));
-   }
+    }
 
     @Test
     public void onNoneAlertType_listenerShouldBeTriggered() {
@@ -330,5 +332,80 @@ public class SirenTest {
         siren.setMajorUpdateAlertType(SirenAlertType.NONE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(listener, Mockito.times(1)).onDetectNewVersionWithoutAlert(Mockito.anyString());
+    }
+
+    @Test
+    public void onVersionCodeUpdate_checkVersionCodeAlertType() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
+                return null;
+            }
+        }).when(siren).performVersionCheck(Mockito.anyString());
+
+        siren.setVersionCodeUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
+    @Test
+    public void onVersionCodeUpdate_checkMajorUpdateAlertType() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
+                return null;
+            }
+        }).when(siren).performVersionCheck(Mockito.anyString());
+
+        siren.setMajorUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
+    @Test
+    public void onVersionCodeUpdate_checkMinorUpdateAlertType() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
+                return null;
+            }
+        }).when(siren).performVersionCheck(Mockito.anyString());
+
+        siren.setMinorUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
+    @Test
+    public void onVersionCodeUpdate_checkPatchUpdateAlertType() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
+                return null;
+            }
+        }).when(siren).performVersionCheck(Mockito.anyString());
+
+        siren.setPatchUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
+    @Test
+    public void onVersionCodeUpdate_checkRevisionUpdateAlertType() {
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
+                return null;
+            }
+        }).when(siren).performVersionCheck(Mockito.anyString());
+
+        siren.setRevisionUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
     }
 }
