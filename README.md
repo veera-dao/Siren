@@ -103,6 +103,14 @@ The following code shows how you can display "stricter" dialogs based on the ver
         siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, SIREN_JSON_DOCUMENT_URL);
 ```
 
+If you'd like to just use `versionCode` for changes, you could check every time and force an update using code like this:
+
+```java
+        Siren siren = Siren.getInstance(getApplicationContext());
+        siren.setVersionCodeUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(this, SirenVersionCheckType.IMMEDIATELY, SIREN_JSON_DOCUMENT_URL);
+```
+
 
 ## Example
 
