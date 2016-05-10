@@ -31,6 +31,7 @@ class SirenHelper {
     @SuppressWarnings("WeakerAccess")
     @VisibleForTesting
     protected SirenHelper() {
+        // visible for testing
     }
 
 
@@ -50,8 +51,7 @@ class SirenHelper {
 
     int getVersionCode(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
-            return pInfo.versionCode;
+            return context.getPackageManager().getPackageInfo(getPackageName(context), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return 0;
@@ -77,10 +77,10 @@ class SirenHelper {
     @NonNull
     String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
-            if (context.getApplicationInfo().labelRes != 0) {
-                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
-            } else {
+            if (context.getApplicationInfo().labelRes == 0) {
                 return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, R.string.fallback_app_name, locale), minAppVersion);
+            } else {
+                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,8 +131,7 @@ class SirenHelper {
 
     String getVersionName(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
-            return pInfo.versionName;
+            return context.getPackageManager().getPackageInfo(getPackageName(context), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return "";

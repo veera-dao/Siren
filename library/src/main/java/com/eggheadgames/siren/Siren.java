@@ -81,6 +81,7 @@ public class Siren {
 
     @VisibleForTesting
     protected Siren() {
+        // visible for testing
     }
 
     public void checkVersion(Activity activity, SirenVersionCheckType versionCheckType, String appDescriptionUrl) {
@@ -110,7 +111,9 @@ public class Siren {
         try {
             JSONObject rootJson = new JSONObject(json);
 
-            if (!rootJson.isNull(getSirenHelper().getPackageName(mApplicationContext))) {
+            if (rootJson.isNull(getSirenHelper().getPackageName(mApplicationContext))) {
+                throw new JSONException("field not found");
+            } else {
                 JSONObject appJson = rootJson.getJSONObject(getSirenHelper().getPackageName(mApplicationContext));
 
                 //version name have higher priority then version code
@@ -119,9 +122,6 @@ public class Siren {
                 }
 
                 checkVersionCode(appJson);
-
-            } else {
-                throw new JSONException("field not found");
             }
 
         } catch (JSONException e) {
@@ -143,40 +143,38 @@ public class Siren {
     }
 
     private boolean checkVersionName(JSONObject appJson) throws JSONException{
-        if (!appJson.isNull(Constants.JSON_MIN_VERSION_NAME)) {
+        if (appJson.isNull(Constants.JSON_MIN_VERSION_NAME)) {
+            return false;
+        }
+        getSirenHelper().setLastVerificationDate(mApplicationContext);
 
-            //save last successful verification date
-            getSirenHelper().setLastVerificationDate(mApplicationContext);
+        String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
+        String currentVersionName = getSirenHelper().getVersionName(mApplicationContext);
 
-            String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
-            String currentVersionName = getSirenHelper().getVersionName(mApplicationContext);
+        if ((getSirenHelper().isEmpty(minVersionName) || getSirenHelper().isEmpty(currentVersionName) || getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName))) {
+            return false;
+        }
+        SirenAlertType alertType = null;
+        String[] minVersionNumbers = minVersionName.split("\\.");
+        String[] currentVersionNumbers = currentVersionName.split("\\.");
+        //noinspection ConstantConditions
+        if (minVersionNumbers != null && currentVersionNumbers != null
+                && minVersionNumbers.length == currentVersionNumbers.length) {
+            if (minVersionNumbers.length > 0 && getSirenHelper().isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
+                alertType = majorUpdateAlertType;
+            } else if (minVersionNumbers.length > 1 && getSirenHelper().isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
+                alertType = minorUpdateAlertType;
+            } else if (minVersionNumbers.length > 2 && getSirenHelper().isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
+                alertType = patchUpdateAlertType;
+            } else if (minVersionNumbers.length > 3 && getSirenHelper().isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
+                alertType = revisionUpdateAlertType;
+            }
 
-            SirenAlertType alertType = null;
-            if (!getSirenHelper().isEmpty(minVersionName) && !getSirenHelper().isEmpty(currentVersionName)
-                    && !getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName)) {
-                String[] minVersionNumbers = minVersionName.split("\\.");
-                String[] currentVersionNumbers = currentVersionName.split("\\.");
-                //noinspection ConstantConditions
-                if (minVersionNumbers != null && currentVersionNumbers != null
-                        && minVersionNumbers.length == currentVersionNumbers.length) {
-                    if (minVersionNumbers.length > 0 && getSirenHelper().isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
-                        alertType = majorUpdateAlertType;
-                    } else if (minVersionNumbers.length > 1 && getSirenHelper().isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
-                        alertType = minorUpdateAlertType;
-                    } else if (minVersionNumbers.length > 2 && getSirenHelper().isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
-                        alertType = patchUpdateAlertType;
-                    } else if (minVersionNumbers.length > 3 && getSirenHelper().isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
-                        alertType = revisionUpdateAlertType;
-                    }
-
-                    if (alertType != null) {
-                        showAlert(minVersionName, alertType);
-                        return true;
-                    }
-                }
+            if (alertType != null) {
+                showAlert(minVersionName, alertType);
+                return true;
             }
         }
-
         return false;
     }
 
@@ -263,10 +261,11 @@ public class Siren {
                                 connection.disconnect();
                                 return null;
                             }
-                            sb.append(line).append("\n");
+                            sb.append(line).append('\n');
                         }
                         br.close();
                         return sb.toString();
+                    default: /* ignore unsuccessful results */
                 }
 
             } catch (IOException ex) {
@@ -292,12 +291,12 @@ public class Siren {
 
         @Override
         protected void onPostExecute(String result) {
-            if (!Siren.sirenInstance.getSirenHelper().isEmpty(result)) {
-                Siren.sirenInstance.handleVerificationResults(result);
-            } else {
+            if (Siren.sirenInstance.getSirenHelper().isEmpty(result)) {
                 if (Siren.sirenInstance.mSirenListener != null) {
                     Siren.sirenInstance.mSirenListener.onError(new NullPointerException());
                 }
+            } else {
+                Siren.sirenInstance.handleVerificationResults(result);
             }
         }
     }
