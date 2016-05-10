@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 class SirenHelper {
     private static final SirenHelper instance = new SirenHelper();
 
+    @NonNull
     public static SirenHelper getInstance() {
         return instance;
     }
@@ -72,6 +74,7 @@ class SirenHelper {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
     }
 
+    @NonNull
     String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
             if (context.getApplicationInfo().labelRes != 0) {
@@ -85,7 +88,11 @@ class SirenHelper {
         }
     }
 
+    @NonNull
     String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
+        if (context == null) {
+            return "";
+        }
         if (locale == null) {
             return context.getString(stringResource);
         } else {
@@ -100,12 +107,14 @@ class SirenHelper {
             //need to turn back the default locale
             new Resources(assets, metrics, defaultConfiguration);
             return string;
-
         }
     }
 
 
     void openGooglePlay(Activity activity) {
+        if (activity == null) {
+            return;
+        }
         final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));

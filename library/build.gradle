@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply from: "quality.gradle"
 
 group='com.github.eggheadgames'
 
