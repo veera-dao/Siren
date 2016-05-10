@@ -186,13 +186,7 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_dialogShouldBeDisplayed() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.times(1)).show();
     }
@@ -289,13 +283,7 @@ public class SirenTest {
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.times(1)).show();
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
         Mockito.when(sirenHelper.isVersionSkippedByUser(Mockito.any(Context.class), Mockito.anyString())).thenReturn(true);
 
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -336,13 +324,7 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_checkVersionCodeAlertType() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
 
         siren.setVersionCodeUpdateAlertType(SirenAlertType.FORCE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -351,13 +333,7 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_checkMajorUpdateAlertType() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
 
         siren.setMajorUpdateAlertType(SirenAlertType.FORCE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -366,13 +342,7 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_checkMinorUpdateAlertType() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
 
         siren.setMinorUpdateAlertType(SirenAlertType.FORCE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -381,13 +351,7 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_checkPatchUpdateAlertType() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockVersionCodeUpdateCase();
 
         siren.setPatchUpdateAlertType(SirenAlertType.FORCE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -396,6 +360,14 @@ public class SirenTest {
 
     @Test
     public void onVersionCodeUpdate_checkRevisionUpdateAlertType() {
+        mockVersionCodeUpdateCase();
+
+        siren.setRevisionUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
+    private void mockVersionCodeUpdateCase() {
         Mockito.doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -403,9 +375,5 @@ public class SirenTest {
                 return null;
             }
         }).when(siren).performVersionCheck(Mockito.anyString());
-
-        siren.setRevisionUpdateAlertType(SirenAlertType.FORCE);
-        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
-        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
     }
 }
