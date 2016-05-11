@@ -9,7 +9,7 @@ findbugs {
 }
 
 pmd {
-  ignoreFailures = true
+  ignoreFailures = false
   reportsDir = file("$project.buildDir/outputs/")
 }
 

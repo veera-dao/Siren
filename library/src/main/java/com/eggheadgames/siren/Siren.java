@@ -32,7 +32,7 @@ import java.net.URL;
  * }
  */
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"WeakerAccess", "unused", "PMD.GodClass"})
 public class Siren {
 
     @VisibleForTesting
@@ -101,6 +101,34 @@ public class Siren {
         }
     }
 
+    public void setMajorUpdateAlertType(@SuppressWarnings("SameParameterValue") SirenAlertType majorUpdateAlertType) {
+        this.majorUpdateAlertType = majorUpdateAlertType;
+    }
+
+    public void setMinorUpdateAlertType(SirenAlertType minorUpdateAlertType) {
+        this.minorUpdateAlertType = minorUpdateAlertType;
+    }
+
+    public void setPatchUpdateAlertType(SirenAlertType patchUpdateAlertType) {
+        this.patchUpdateAlertType = patchUpdateAlertType;
+    }
+
+    public void setRevisionUpdateAlertType(SirenAlertType revisionUpdateAlertType) {
+        this.revisionUpdateAlertType = revisionUpdateAlertType;
+    }
+
+    public void setSirenListener(ISirenListener sirenListener) {
+        this.mSirenListener = sirenListener;
+    }
+
+    public void setVersionCodeUpdateAlertType(SirenAlertType versionCodeUpdateAlertType) {
+        this.versionCodeUpdateAlertType = versionCodeUpdateAlertType;
+    }
+
+    public void setLanguageLocalization(SirenSupportedLocales localization) {
+        forceLanguageLocalization = localization;
+    }
+
     @VisibleForTesting
     protected void performVersionCheck(String appDescriptionUrl) {
         new LoadJsonTask().execute(appDescriptionUrl);
@@ -151,7 +179,7 @@ public class Siren {
         String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
         String currentVersionName = getSirenHelper().getVersionName(mApplicationContext);
 
-        if ((getSirenHelper().isEmpty(minVersionName) || getSirenHelper().isEmpty(currentVersionName) || getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName))) {
+        if (getSirenHelper().isEmpty(minVersionName) || getSirenHelper().isEmpty(currentVersionName) || getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName)) {
             return false;
         }
         SirenAlertType alertType = null;
@@ -205,35 +233,7 @@ public class Siren {
         }
     }
 
-    public void setMajorUpdateAlertType(@SuppressWarnings("SameParameterValue") SirenAlertType majorUpdateAlertType) {
-        this.majorUpdateAlertType = majorUpdateAlertType;
-    }
-
-    public void setMinorUpdateAlertType(SirenAlertType minorUpdateAlertType) {
-        this.minorUpdateAlertType = minorUpdateAlertType;
-    }
-
-    public void setPatchUpdateAlertType(SirenAlertType patchUpdateAlertType) {
-        this.patchUpdateAlertType = patchUpdateAlertType;
-    }
-
-    public void setRevisionUpdateAlertType(SirenAlertType revisionUpdateAlertType) {
-        this.revisionUpdateAlertType = revisionUpdateAlertType;
-    }
-
-    public void setSirenListener(ISirenListener sirenListener) {
-        this.mSirenListener = sirenListener;
-    }
-
-    public void setVersionCodeUpdateAlertType(SirenAlertType versionCodeUpdateAlertType) {
-        this.versionCodeUpdateAlertType = versionCodeUpdateAlertType;
-    }
-
-    public void setLanguageLocalization(SirenSupportedLocales localization) {
-        forceLanguageLocalization = localization;
-    }
-
-    public static class LoadJsonTask extends AsyncTask<String, Void, String> {
+    private static class LoadJsonTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
