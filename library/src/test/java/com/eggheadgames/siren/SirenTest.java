@@ -12,6 +12,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import static org.mockito.Matchers.eq;
+
 @RunWith(MockitoJUnitRunner.class)
 public class SirenTest {
     private static final String APP_DESCRIPTION_URL = "http://example.com";
@@ -73,10 +75,15 @@ public class SirenTest {
 
         Mockito.when(siren.getSirenHelper()).thenReturn(sirenHelper);
         Mockito.doReturn(alertWrapper).when(siren).getAlertWrapper(Mockito.any(SirenAlertType.class), Mockito.anyString());
+
+        mockResult(TestConstants.jsonVersionNameMajorUpdate);
+    }
+
+    private void mockResult(final String forResult) {
         Mockito.doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNameMajorUpdate);
+                siren.handleVerificationResults(forResult);
                 return null;
             }
         }).when(siren).performVersionCheck(Mockito.anyString());
@@ -150,100 +157,45 @@ public class SirenTest {
 
     @Test
     public void onMalformedJson_verificationShouldBeIgnored() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonMalformed);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonMalformed);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.never()).show();
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonMalformed2);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonMalformed2);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.never()).show();
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonMalformed3);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonMalformed3);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.never()).show();
-
     }
 
     @Test
     public void onVersionCodeUpdate_dialogShouldBeDisplayed() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionCodeUpdate);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.times(1)).show();
     }
 
     @Test
     public void onOutdatedVersionCode_dialogShouldNotBeShown() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeOutdated);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionCodeOutdated);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.never()).show();
     }
 
     @Test
     public void onVersionNameUpdate_dialogShouldBeDisplayed() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNameMajorUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionNameMajorUpdate);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNameMinorUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionNameMinorUpdate);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNamePatchUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionNamePatchUpdate);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNameRevisionUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionNameRevisionUpdate);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
         Mockito.verify(alertWrapper, Mockito.times(4)).show();
@@ -251,13 +203,7 @@ public class SirenTest {
 
     @Test
     public void onOutdatedVersionName_dialogShouldNotBeDisplayed() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionNameOutdated);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionNameOutdated);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
         Mockito.verify(alertWrapper, Mockito.never()).show();
@@ -287,13 +233,7 @@ public class SirenTest {
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(alertWrapper, Mockito.times(1)).show();
 
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonVersionCodeUpdate);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonVersionCodeUpdate);
         Mockito.when(sirenHelper.isVersionSkippedByUser(Mockito.any(Context.class), Mockito.anyString())).thenReturn(true);
 
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
@@ -309,19 +249,13 @@ public class SirenTest {
 
     @Test
     public void onVerificationFailure_listenerShouldBeTriggered() {
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                siren.handleVerificationResults(TestConstants.jsonMalformed);
-                return null;
-            }
-        }).when(siren).performVersionCheck(Mockito.anyString());
+        mockResult(TestConstants.jsonMalformed);
 
         ISirenListener listener = Mockito.mock(ISirenListener.class);
         siren.setSirenListener(listener);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(listener, Mockito.times(1)).onError(Mockito.any(Exception.class));
-   }
+    }
 
     @Test
     public void onNoneAlertType_listenerShouldBeTriggered() {
@@ -331,4 +265,14 @@ public class SirenTest {
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
         Mockito.verify(listener, Mockito.times(1)).onDetectNewVersionWithoutAlert(Mockito.anyString());
     }
+
+    @Test
+    public void onVersionCodeUpdate_checkVersionCodeAlertType() {
+        mockResult(TestConstants.jsonVersionCodeUpdate);
+
+        siren.setVersionCodeUpdateAlertType(SirenAlertType.FORCE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
+
 }

@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 class SirenHelper {
     private static final SirenHelper instance = new SirenHelper();
 
+    @NonNull
     public static SirenHelper getInstance() {
         return instance;
     }
@@ -29,6 +31,7 @@ class SirenHelper {
     @SuppressWarnings("WeakerAccess")
     @VisibleForTesting
     protected SirenHelper() {
+        // visible for testing
     }
 
 
@@ -48,8 +51,7 @@ class SirenHelper {
 
     int getVersionCode(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
-            return pInfo.versionCode;
+            return context.getPackageManager().getPackageInfo(getPackageName(context), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return 0;
@@ -72,12 +74,13 @@ class SirenHelper {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.PREFERENCES_LAST_CHECK_DATE, 0);
     }
 
+    @NonNull
     String getAlertMessage(Context context, String minAppVersion, SirenSupportedLocales locale) {
         try {
-            if (context.getApplicationInfo().labelRes != 0) {
-                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
-            } else {
+            if (context.getApplicationInfo().labelRes == 0) {
                 return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, R.string.fallback_app_name, locale), minAppVersion);
+            } else {
+                return String.format(getLocalizedString(context, R.string.update_alert_message, locale), getLocalizedString(context, context.getApplicationInfo().labelRes, locale), minAppVersion);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,7 +88,11 @@ class SirenHelper {
         }
     }
 
+    @NonNull
     String getLocalizedString(Context context, int stringResource, SirenSupportedLocales locale) {
+        if (context == null) {
+            return "";
+        }
         if (locale == null) {
             return context.getString(stringResource);
         } else {
@@ -100,12 +107,14 @@ class SirenHelper {
             //need to turn back the default locale
             new Resources(assets, metrics, defaultConfiguration);
             return string;
-
         }
     }
 
 
     void openGooglePlay(Activity activity) {
+        if (activity == null) {
+            return;
+        }
         final String appPackageName = getPackageName(activity);
         try {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -122,8 +131,7 @@ class SirenHelper {
 
     String getVersionName(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(context), 0);
-            return pInfo.versionName;
+            return context.getPackageManager().getPackageInfo(getPackageName(context), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return "";

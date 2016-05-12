@@ -36,7 +36,11 @@ public class SirenAlertWrapper {
     }
 
     public void show() {
-        if (mActivityRef.get() != null) {
+        if (mActivityRef.get() == null) {
+            if (mSirenListener != null) {
+                mSirenListener.onError(new NullPointerException("activity reference is null"));
+            }
+        } else {
             Dialog dialog;
             if (mTheme > 0) {
                 dialog = new Dialog(mActivityRef.get(), mTheme);
@@ -49,12 +53,6 @@ public class SirenAlertWrapper {
 
             if (mSirenListener != null) {
                 mSirenListener.onShowUpdateDialog();
-            }
-
-
-        } else {
-            if (mSirenListener != null) {
-                mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
         }
     }

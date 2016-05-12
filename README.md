@@ -4,7 +4,7 @@
 
 # Siren for Android
 
-### Notify users when a new version of your Android app is available, and prompt them with the Play Store link. 
+### Notify users when a new version of your Android app is available, and prompt them with the Play Store link.
 
 This is a port of the iOS library of the same name: https://github.com/ArtSabintsev/Siren
 
@@ -27,7 +27,7 @@ If a new version is available, an alert can be presented to the user informing t
 
 ## Similar Android libraries
 
-Choose what works best for your scenario. We chose _not_ to "screenscrape" the Google Play Listing. We've kept the prompt & update scenarios simple. We kept close to the iOS Siren library to keep our iOS & Android apps similar. Other Android solutions: [AppUpdater](https://github.com/javiersantos/AppUpdater) (the most comprehensive and feature rich library, including support for checks at Amazon and FDroid), [Gandalf](https://github.com/btkelly/gandalf) (also has a "companion" iOS solution), [Update Checker](https://github.com/rampo/UpdateChecker), [Fit](https://github.com/KeithYokoma/Fit) (callback framework, no UI), 
+Choose what works best for your scenario. We chose _not_ to "screenscrape" the Google Play Listing. We've kept the prompt & update scenarios simple. We kept close to the iOS Siren library to keep our iOS & Android apps similar. Other Android solutions: [AppUpdater](https://github.com/javiersantos/AppUpdater) (the most comprehensive and feature rich library, including support for checks at Amazon and FDroid), [Gandalf](https://github.com/btkelly/gandalf) (also has a "companion" iOS solution), [Update Checker](https://github.com/rampo/UpdateChecker), [Fit](https://github.com/KeithYokoma/Fit) (callback framework, no UI),
 
 ## Screenshots & Alert Types
 
@@ -43,7 +43,7 @@ Choose what works best for your scenario. We chose _not_ to "screenscrape" the G
 
 ## Setup
 
-A minimal usage is to add the following to the `onCreate` of your main activity. 
+A minimal usage is to add the following to the `onCreate` of your main activity.
 This will check at most once a day for a new version and give the user the option to choose "Update" or "Next time".
 
 ```java
@@ -68,7 +68,7 @@ Add a dependency to your application related `build.gradle`
 
 ```gradle
 dependencies {
-    compile 'com.github.eggheadgames:Siren:1.4.2'
+    compile 'com.github.eggheadgames:Siren:1.4.3'
 }
 ```
 
@@ -88,7 +88,7 @@ The **SirenVersionCheckType** controls how often the server is checked for a new
 
 You can also define the dialog appearance and behaviour by setting **SirenAlertType** to react according to your version increment per [Semantic Versioning](http://semver.org/). The default is `SirenAlertType.OPTION`. This generates a 2 button "Next Time" or "Update" alert. Other values are `FORCE`, `SKIP` and `NONE`. `NONE` will not display an alert, but will call your listener with appropriate text to display. See **Example** below.
 
-You can combine these options to have different behaviour for different version changes. For example, you might will force a user to upgrade for a major version change (e.g. 1.x.x to 2.x.x), give them a "Next time" option for a minor version change (e.g. 1.2.x to 1.3.x) and add a 3rd "Skip this version" option for a 3rd or 4th level change (e.g. 1.2.5 to 1.2.6).  
+You can combine these options to have different behaviour for different version changes. For example, you might will force a user to upgrade for a major version change (e.g. 1.x.x to 2.x.x), give them a "Next time" option for a minor version change (e.g. 1.2.x to 1.3.x) and add a 3rd "Skip this version" option for a 3rd or 4th level change (e.g. 1.2.5 to 1.2.6).
 
 As well as the levels: Major, Minor, Patch and Revision, you can also set messages based on the `versionCode` of your app by using a `minVersionCode` field instead of `minVersionName`.
 
@@ -114,7 +114,7 @@ If you'd like to just use `versionCode` for changes, you could check every time 
 
 ## Example
 
-Some developers may want to display a less obtrusive custom interface, like a banner or small icon. 
+Some developers may want to display a less obtrusive custom interface, like a banner or small icon.
 You may also wish to control which level of update to force a user to update vs deferring to later.
 
 You can find a fully functional sample project at https://github.com/eggheadgames/SirenSample.
@@ -179,7 +179,7 @@ You may want the update dialog to always appear in a certain language, ignoring 
 
 ## Testing Siren
 
-Change the url in your app to point to a test location (e.g. http://myjson.com/ is a convenient test site). Create an appropriate file and run your app with the temporary url.  
+Change the url in your app to point to a test location (e.g. http://myjson.com/ is a convenient test site). Create an appropriate file and run your app with the temporary url.
 
 For example, if my app's current version is `2.1.0.0` and the `applicationId` is `com.eggheadgames.sirensample`, I could create a json file with contents:
 ```json
