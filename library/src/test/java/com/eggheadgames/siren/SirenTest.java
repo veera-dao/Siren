@@ -47,6 +47,13 @@ public class SirenTest {
                 return Integer.parseInt((String) invocation.getArguments()[0]) > Integer.parseInt((String) invocation.getArguments()[1]);
             }
         });
+
+        Mockito.when(sirenHelper.isEquals(Mockito.anyString(), Mockito.anyString())).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return Integer.parseInt((String) invocation.getArguments()[0]) == Integer.parseInt((String) invocation.getArguments()[1]);
+            }
+        });
         Mockito.when(sirenHelper.isEmpty(Mockito.anyString())).thenAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
@@ -275,4 +282,17 @@ public class SirenTest {
         Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
     }
 
+    @Test
+    public void onVersionUpdateWithFreshInstall_shouldNotFireAllertIfVersionUpToDate() {
+        mockResult(TestConstants.jsonVersionNameOutdatedTest);
+        Mockito.when(sirenHelper.getVersionName(activity)).thenReturn(TestConstants.appVersionNameTest);
+
+        ISirenListener listener = Mockito.mock(ISirenListener.class);
+        siren.setSirenListener(listener);
+        siren.setRevisionUpdateAlertType(SirenAlertType.NONE);
+
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+
+        Mockito.verify(listener, Mockito.never()).onDetectNewVersionWithoutAlert(Mockito.anyString());
+    }
 }

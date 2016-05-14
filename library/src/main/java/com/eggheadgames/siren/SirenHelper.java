@@ -142,6 +142,10 @@ class SirenHelper {
         return TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second) && Integer.parseInt(first) > Integer.parseInt(second);
     }
 
+    boolean isEquals(String first, String second) {
+        return TextUtils.isDigitsOnly(first) && TextUtils.isDigitsOnly(second) && Integer.parseInt(first) == Integer.parseInt(second);
+    }
+
     boolean isEmpty(String appDescriptionUrl) {
         return TextUtils.isEmpty(appDescriptionUrl);
     }

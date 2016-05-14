@@ -3,6 +3,7 @@ package com.eggheadgames.siren;
 interface TestConstants {
 
     String appVersionName = "1.1.1.1";
+    String appVersionNameTest = "0.0.1.0";
     int appVersionCode = 1;
     String appPackageName = "com.example.app";
 
@@ -10,6 +11,7 @@ interface TestConstants {
     String jsonVersionNameMinorUpdate = "{\"com.example.app\":{\"minVersionName\":\"1.2.1.1\"}}";
     String jsonVersionNamePatchUpdate = "{\"com.example.app\":{\"minVersionName\":\"1.1.2.1\"}}";
     String jsonVersionNameOutdated = "{\"com.example.app\":{\"minVersionName\":\"0.0.0.0\"}}";
+    String jsonVersionNameOutdatedTest = "{\"com.example.app\":{\"minVersionName\":\"0.0.0.1\"}}";
 
     String jsonVersionNameRevisionUpdate = "{\"com.example.app\":{\"minVersionName\":\"1.1.1.2\"}}";
 

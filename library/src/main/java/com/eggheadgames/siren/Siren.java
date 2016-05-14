@@ -188,14 +188,22 @@ public class Siren {
         //noinspection ConstantConditions
         if (minVersionNumbers != null && currentVersionNumbers != null
                 && minVersionNumbers.length == currentVersionNumbers.length) {
-            if (minVersionNumbers.length > 0 && getSirenHelper().isGreater(minVersionNumbers[0], currentVersionNumbers[0])) {
+            int digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 0);
+            if (digitVerificationCode == 0) {
+                digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 1);
+                if (digitVerificationCode == 0) {
+                    digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 2);
+                    if (digitVerificationCode == 0) {
+                        if (checkVersionDigit(minVersionNumbers, currentVersionNumbers, 3) == 1) {
+                            alertType = revisionUpdateAlertType;                       }
+                    } else if (digitVerificationCode == 1) {
+                        alertType = patchUpdateAlertType;
+                    }
+                } else if (digitVerificationCode == 1) {
+                    alertType = minorUpdateAlertType;
+                }
+            } else if (digitVerificationCode == 1) {
                 alertType = majorUpdateAlertType;
-            } else if (minVersionNumbers.length > 1 && getSirenHelper().isGreater(minVersionNumbers[1], currentVersionNumbers[1])) {
-                alertType = minorUpdateAlertType;
-            } else if (minVersionNumbers.length > 2 && getSirenHelper().isGreater(minVersionNumbers[2], currentVersionNumbers[2])) {
-                alertType = patchUpdateAlertType;
-            } else if (minVersionNumbers.length > 3 && getSirenHelper().isGreater(minVersionNumbers[3], currentVersionNumbers[3])) {
-                alertType = revisionUpdateAlertType;
             }
 
             if (alertType != null) {
@@ -204,6 +212,17 @@ public class Siren {
             }
         }
         return false;
+    }
+
+    private int checkVersionDigit(String[] minVersionNumbers, String[] currentVersionNumbers, int digitIndex) {
+        if (minVersionNumbers.length > digitIndex) {
+            if (getSirenHelper().isGreater(minVersionNumbers[digitIndex], currentVersionNumbers[digitIndex])) {
+                return 1;
+            } else if (getSirenHelper().isEquals(minVersionNumbers[digitIndex], currentVersionNumbers[digitIndex])) {
+                return 0;
+            }
+        }
+        return -1;
     }
 
     @SuppressWarnings("UnusedReturnValue")
