@@ -2,6 +2,7 @@ package com.eggheadgames.siren;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class SirenAlertWrapper {
             if (mSirenListener != null) {
                 mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
-        } else {
+        } else if ((Build.VERSION.SDK_INT >= 17 && mActivityRef.get().isDestroyed()) || mActivityRef.get().isFinishing()){
             Dialog dialog;
             if (mTheme > 0) {
                 dialog = new Dialog(mActivityRef.get(), mTheme);
