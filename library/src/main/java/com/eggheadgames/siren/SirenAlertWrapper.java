@@ -41,7 +41,7 @@ public class SirenAlertWrapper {
             if (mSirenListener != null) {
                 mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
-        } else if ((Build.VERSION.SDK_INT >= 17 && mActivityRef.get().isDestroyed()) || mActivityRef.get().isFinishing()){
+        } else if ((Build.VERSION.SDK_INT >= 17 && !mActivityRef.get().isDestroyed()) || !mActivityRef.get().isFinishing()){
             Dialog dialog;
             if (mTheme > 0) {
                 dialog = new Dialog(mActivityRef.get(), mTheme);
