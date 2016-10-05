@@ -6,6 +6,8 @@ dependencies:
     - if [ ! -d "/usr/local/android-sdk-linux/build-tools/24.0.2" ]; then echo y | android update sdk --no-ui --all --filter "build-tools-24.0.2"; fi
     # Android Support Repository, revision 35 / Local Maven repository for Support Libraries
     - if [ ! -d "/usr/local/android-sdk-linux/extras/android/m2repository/com/android/support/design/24.2.1" ]; then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
+    # Android
+    - echo yes | android update sdk --no-ui --all --filter "platform-tools-24.0.3"
 
   cache_directories:
     - /usr/local/android-sdk-linux/platforms/android-24
