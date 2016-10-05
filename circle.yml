@@ -1,7 +1,11 @@
 dependencies:
   pre:
-    - echo y | android update sdk --no-ui --all --filter "tools,platform-tools,android-24"
-    - echo y | android update sdk --no-ui --all --filter "build-tools-24.0.2"
+    # Android SDK Platform 24
+    - if [ ! -d "/usr/local/android-sdk-linux/platforms/android-24" ]; then echo y | android update sdk --no-ui --all --filter "android-24"; fi
+    # Android SDK Build-tools, revision 24.0.1
+    - if [ ! -d "/usr/local/android-sdk-linux/build-tools/24.0.2" ]; then echo y | android update sdk --no-ui --all --filter "build-tools-24.0.2"; fi
+    # Android Support Repository, revision 35 / Local Maven repository for Support Libraries
+    - if [ ! -d "/usr/local/android-sdk-linux/extras/android/m2repository/com/android/support/design/24.2.1" ]; then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
 
 test:
   override:
