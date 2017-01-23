@@ -11,12 +11,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-/**
- * @author fkrauthan
- */
 public class TLSSocketFactory extends SSLSocketFactory {
 
-  private SSLSocketFactory internalSSLSocketFactory;
+  private final SSLSocketFactory internalSSLSocketFactory;
 
   public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
     SSLContext context = SSLContext.getInstance("TLS");
@@ -60,7 +57,7 @@ public class TLSSocketFactory extends SSLSocketFactory {
   }
 
   private Socket enableTLSOnSocket(Socket socket) {
-    if (socket != null && (socket instanceof SSLSocket)) {
+    if (socket instanceof SSLSocket) {
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
         ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.1", "TLSv1.2"});
       } else {
