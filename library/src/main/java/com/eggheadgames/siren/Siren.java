@@ -12,8 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  *JSON format should be the following
@@ -256,15 +259,17 @@ public class Siren {
 
         @Override
         protected String doInBackground(String... params) {
-            HttpURLConnection connection = null;
+            HttpsURLConnection connection = null;
             try {
+                TLSSocketFactory TLSSocketFactory = new TLSSocketFactory();
                 URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
+                connection = (HttpsURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setUseCaches(false);
                 connection.setAllowUserInteraction(false);
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
+                connection.setSSLSocketFactory(TLSSocketFactory);
                 connection.connect();
                 int status = connection.getResponseCode();
 
@@ -293,6 +298,8 @@ public class Siren {
                     Siren.sirenInstance.mSirenListener.onError(ex);
                 }
 
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+              e.printStackTrace();
             } finally {
                 if (connection != null) {
                     try {
