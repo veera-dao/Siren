@@ -5,14 +5,14 @@ apply from: "quality.gradle"
 group='com.github.eggheadgames'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 6
-        versionName "1.4.4"
+        versionName "1.4.6"
     }
     buildTypes {
         release {
@@ -32,5 +32,5 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleDependency
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.0.0'
 }
