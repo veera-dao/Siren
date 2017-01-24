@@ -12,9 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -259,17 +258,19 @@ public class Siren {
 
         @Override
         protected String doInBackground(String... params) {
-            HttpsURLConnection connection = null;
+            HttpURLConnection connection = null;
             try {
                 TLSSocketFactory TLSSocketFactory = new TLSSocketFactory();
                 URL url = new URL(params[0]);
-                connection = (HttpsURLConnection) url.openConnection();
+                connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setUseCaches(false);
                 connection.setAllowUserInteraction(false);
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
-                connection.setSSLSocketFactory(TLSSocketFactory);
+                if ("https".equalsIgnoreCase(url.getProtocol())) {
+                    ((HttpsURLConnection)connection).setSSLSocketFactory(TLSSocketFactory);
+                }
                 connection.connect();
                 int status = connection.getResponseCode();
 
@@ -298,8 +299,8 @@ public class Siren {
                     Siren.sirenInstance.mSirenListener.onError(ex);
                 }
 
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-              e.printStackTrace();
+            } catch (Exception ex) {
+              ex.printStackTrace();
             } finally {
                 if (connection != null) {
                     try {
