@@ -295,4 +295,27 @@ public class SirenTest {
 
         Mockito.verify(listener, Mockito.never()).onDetectNewVersionWithoutAlert(Mockito.anyString());
     }
+
+    @Test
+    public void onVersionCheckDisabled_shouldNotDoVersionCheck() {
+        mockResult(TestConstants.jsonVersionCheckDisabled);
+        Mockito.when(sirenHelper.getVersionName(activity)).thenReturn(TestConstants.appVersionNameTest);
+
+        ISirenListener listener = Mockito.mock(ISirenListener.class);
+        siren.setSirenListener(listener);
+        siren.setMajorUpdateAlertType(SirenAlertType.NONE);
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+
+        Mockito.verify(listener, Mockito.never()).onDetectNewVersionWithoutAlert(Mockito.anyString());
+    }
+
+    @Test
+    public void onForceUpdateEnabled_shouldShowForceAlertType() {
+        mockResult(TestConstants.jsonForceUpdateEnabled);
+        Mockito.when(sirenHelper.getVersionName(activity)).thenReturn(TestConstants.appVersionNameTest);
+
+        siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
+
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+    }
 }
