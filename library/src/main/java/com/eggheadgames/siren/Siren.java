@@ -213,7 +213,7 @@ public class Siren {
                             case 1: alertType = minorUpdateAlertType; break;
                             case 2: alertType = patchUpdateAlertType; break;
                             case 3: alertType = revisionUpdateAlertType; break;
-                            default: alertType = SirenAlertType.OPTION;
+                            default: alertType = SirenAlertType.OPTION; break;
                         }
                     }
                     break;
