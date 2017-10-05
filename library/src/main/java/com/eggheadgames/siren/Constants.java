@@ -7,4 +7,8 @@ final class Constants {
 
     static final String JSON_MIN_VERSION_CODE = "minVersionCode";
     static final String JSON_MIN_VERSION_NAME = "minVersionName";
+
+    static final String JSON_FORCE_ALERT_TYPE = "force";
+
+    static final String JSON_ENABLE_VERSION_CHECK = "enable";
 }

@@ -178,37 +178,51 @@ public class Siren {
         }
         getSirenHelper().setLastVerificationDate(mApplicationContext);
 
+        // If no config found, assume version check is enabled
+        Boolean versionCheckEnabled = appJson.has(Constants.JSON_ENABLE_VERSION_CHECK) ? appJson.getBoolean(Constants.JSON_ENABLE_VERSION_CHECK) : true;
+        if (!versionCheckEnabled) {
+            return false;
+        }
+
+        // If no config found, assume force update = false
+        Boolean forceUpdateEnabled = appJson.has(Constants.JSON_FORCE_ALERT_TYPE) ? appJson.getBoolean(Constants.JSON_FORCE_ALERT_TYPE) : false;
         String minVersionName = appJson.getString(Constants.JSON_MIN_VERSION_NAME);
         String currentVersionName = getSirenHelper().getVersionName(mApplicationContext);
 
         if (getSirenHelper().isEmpty(minVersionName) || getSirenHelper().isEmpty(currentVersionName) || getSirenHelper().isVersionSkippedByUser(mApplicationContext, minVersionName)) {
             return false;
         }
+
         SirenAlertType alertType = null;
         String[] minVersionNumbers = minVersionName.split("\\.");
         String[] currentVersionNumbers = currentVersionName.split("\\.");
         //noinspection ConstantConditions
         if (minVersionNumbers != null && currentVersionNumbers != null
                 && minVersionNumbers.length == currentVersionNumbers.length) {
-            int digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 0);
-            if (digitVerificationCode == 0) {
-                digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 1);
-                if (digitVerificationCode == 0) {
-                    digitVerificationCode = checkVersionDigit(minVersionNumbers, currentVersionNumbers, 2);
-                    if (digitVerificationCode == 0) {
-                        if (checkVersionDigit(minVersionNumbers, currentVersionNumbers, 3) == 1) {
-                            alertType = revisionUpdateAlertType;                       }
-                    } else if (digitVerificationCode == 1) {
-                        alertType = patchUpdateAlertType;
+
+            Boolean versionUpdateDetected = false;
+            for (Integer index = 0; index < Math.min(minVersionNumbers.length, currentVersionNumbers.length); index++) {
+                Integer compareResult = checkVersionDigit(minVersionNumbers, currentVersionNumbers, index);
+                if (compareResult == 1) {
+                    versionUpdateDetected = true;
+                    if (forceUpdateEnabled) {
+                        alertType = SirenAlertType.FORCE;
+                    } else {
+                        switch (index) {
+                            case 0: alertType = majorUpdateAlertType; break;
+                            case 1: alertType = minorUpdateAlertType; break;
+                            case 2: alertType = patchUpdateAlertType; break;
+                            case 3: alertType = revisionUpdateAlertType; break;
+                            default: alertType = SirenAlertType.OPTION;
+                        }
                     }
-                } else if (digitVerificationCode == 1) {
-                    alertType = minorUpdateAlertType;
+                    break;
+                } else if (compareResult == -1) {
+                    return false;
                 }
-            } else if (digitVerificationCode == 1) {
-                alertType = majorUpdateAlertType;
             }
 
-            if (alertType != null) {
+            if (versionUpdateDetected) {
                 showAlert(minVersionName, alertType);
                 return true;
             }
@@ -231,13 +245,21 @@ public class Siren {
     private boolean checkVersionCode(JSONObject appJson) throws JSONException{
         if (!appJson.isNull(Constants.JSON_MIN_VERSION_CODE)) {
             int minAppVersionCode = appJson.getInt(Constants.JSON_MIN_VERSION_CODE);
+            // If no config found, assume version check is enabled
+            Boolean versionCheckEnabled = appJson.has(Constants.JSON_ENABLE_VERSION_CHECK) ? appJson.getBoolean(Constants.JSON_ENABLE_VERSION_CHECK) : true;
+            if (!versionCheckEnabled) {
+                return false;
+            }
+
+            // If no config found, assume force update = false
+            Boolean forceUpdateEnabled = appJson.has(Constants.JSON_FORCE_ALERT_TYPE) ? appJson.getBoolean(Constants.JSON_FORCE_ALERT_TYPE) : false;
 
             //save last successful verification date
             getSirenHelper().setLastVerificationDate(mApplicationContext);
 
             if (getSirenHelper().getVersionCode(mApplicationContext) < minAppVersionCode
                     && !getSirenHelper().isVersionSkippedByUser(mApplicationContext, String.valueOf(minAppVersionCode))) {
-                showAlert(String.valueOf(minAppVersionCode), versionCodeUpdateAlertType);
+                showAlert(String.valueOf(minAppVersionCode), forceUpdateEnabled ? SirenAlertType.FORCE : versionCodeUpdateAlertType);
                 return true;
             }
         }
