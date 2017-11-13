@@ -36,9 +36,9 @@ Choose what works best for your scenario. We chose _not_ to "screenscrape" the G
 - The **right picture** gives the user the option to skip the current update.
 - These options are controlled by the `SirenAlertType` enum.
 
-<img src="https://github.com/EggheadGames/Siren/blob/master/extras/force.png?raw=true" height=480">
-<img src="https://github.com/EggheadGames/Siren/blob/master/extras/option.png?raw=true" height=480">
-<img src="https://github.com/EggheadGames/Siren/blob/master/extras/skip.png?raw=true" height=480">
+![Force update](/extras/force.png)
+![Optional update](/extras/option.png)
+![Skip update](/extras/skip.png)
 
 
 ## Setup
