@@ -22,4 +22,6 @@ interface TestConstants {
     String jsonMalformed2 = "{}";
     String jsonMalformed3 = "{\"com.example.app\":{\"someField\":\"1.2.1.1\"}}";
 
+    String jsonVersionCheckDisabled = "{\"com.example.app\":{\"minVersionName\":\"2.1.1.1\", \"enable\": false}}";
+    String jsonForceUpdateEnabled = "{\"com.example.app\":{\"minVersionName\":\"2.1.1.1\", \"force\": true}}";
 }
