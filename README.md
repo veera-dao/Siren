@@ -82,6 +82,18 @@ OR
 { "com.example.app": { "minVersionCode": 7 } }
 ```
 
+Parameters supported on the JSON document:
+
+- **minVersionName**: The minimum version name required.
+- **minVersionCode**: The minimum version code required, minVersionName will take precendence if both specified.
+- **enable**: A boolean flag to remotely toggle the version check feature.
+- **force**: A boolean flag to remotely set alertType as FORCE on every type of update.
+
+Example:
+```json
+{ "com.example.app": { "minVersionCode": 7, "enable": true, "force": false } }
+```
+
 ## Options
 
 The **SirenVersionCheckType** controls how often the server is checked for a new version, and hence how often the user will be prompted. You can set it to `IMMEDIATELY`, `DAILY` or `WEEKLY`.
