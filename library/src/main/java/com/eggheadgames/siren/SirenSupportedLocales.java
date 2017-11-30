@@ -2,6 +2,7 @@ package com.eggheadgames.siren;
 
 @SuppressWarnings("unused")
 public enum SirenSupportedLocales {
+    EL("el"),
     AR("ar"),
     DA("da"),
     DE("de"),
