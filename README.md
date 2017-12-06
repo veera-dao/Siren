@@ -181,7 +181,7 @@ Here is a code sample that shows how to handle all the alerts yourself:
 
 ## Localization
 
-Siren is localized for Arabic, Armenian, Basque, Chinese (Simplified), Chinese (Traditional), Danish, Dutch, English, Estonian, French, German, Hebrew, Hungarian, Italian, Japanese, Korean, Latvian, Lithuanian, Malay, Polish, Portuguese (Brazil), Portuguese (Portugal), Russian, Slovenian, Swedish, Spanish, Thai, and Turkish.
+Siren is localized for Arabic, Armenian, Basque, Chinese (Simplified), Chinese (Traditional), Danish, Dutch, English, Estonian, French, German, Greek, Hebrew, Hungarian, Italian, Japanese, Korean, Latvian, Lithuanian, Malay, Polish, Portuguese (Brazil), Portuguese (Portugal), Russian, Slovenian, Swedish, Spanish, Thai, and Turkish.
 
 You may want the update dialog to always appear in a certain language, ignoring Android's language setting. This is supported with the `setLanguageLocalization` method. For example, you can force a French update dialog by setting the locale as follows:
 
