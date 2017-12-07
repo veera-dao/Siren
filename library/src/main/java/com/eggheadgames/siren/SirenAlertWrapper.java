@@ -1,8 +1,10 @@
 package com.eggheadgames.siren;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
+import android.app.AlertDialog;
 import android.os.Build;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,7 +19,6 @@ public class SirenAlertWrapper {
     private final String mMinAppVersion;
     private final SirenSupportedLocales mLocale;
     private final SirenHelper mSirenHelper;
-    private int mTheme;
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType,
                              String minAppVersion, SirenSupportedLocales locale, SirenHelper sirenHelper) {
@@ -29,12 +30,6 @@ public class SirenAlertWrapper {
         this.mActivityRef = new WeakReference<>(activity);
     }
 
-    @SuppressWarnings("unused")
-    public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType,
-                             String minAppVersion, SirenSupportedLocales locale, SirenHelper sirenHelper, int theme) {
-        this(activity, sirenListener, sirenAlertType, minAppVersion, locale, sirenHelper);
-        this.mTheme = theme;
-    }
 
     public void show() {
         Activity activity = mActivityRef.get();
@@ -43,15 +38,9 @@ public class SirenAlertWrapper {
                 mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
         } else if (Build.VERSION.SDK_INT >= 17 && !activity.isDestroyed() || Build.VERSION.SDK_INT < 17 && !activity.isFinishing()) {
-            Dialog dialog;
-            if (mTheme > 0) {
-                dialog = new Dialog(activity, mTheme);
-            } else {
-                dialog = new Dialog(activity);
-            }
-            setupDialog(dialog);
-            dialog.setCancelable(false);
-            dialog.show();
+
+            AlertDialog alertDialog = initDialog(activity);
+            setupDialog(alertDialog);
 
             if (mSirenListener != null) {
                 mSirenListener.onShowUpdateDialog();
@@ -59,9 +48,23 @@ public class SirenAlertWrapper {
         }
     }
 
-    private void setupDialog(final Dialog dialog) {
-        dialog.setTitle(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.update_available, mLocale));
-        dialog.setContentView(R.layout.siren_dialog);
+    @SuppressLint("InflateParams")
+    private AlertDialog initDialog(Activity activity) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+
+        alertBuilder.setTitle(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.update_available, mLocale));
+        alertBuilder.setCancelable(false);
+
+        View dialogView = LayoutInflater.from(activity).inflate(R.layout.siren_dialog, null);
+        alertBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
+
+        return alertDialog;
+    }
+
+    private void setupDialog(final AlertDialog dialog) {
         TextView message = (TextView) dialog.findViewById(R.id.tvSirenAlertMessage);
         Button update = (Button) dialog.findViewById(R.id.btnSirenUpdate);
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
