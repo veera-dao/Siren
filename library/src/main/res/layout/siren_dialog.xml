@@ -41,7 +41,7 @@
             android:layout_marginLeft="@dimen/half_margin"
             android:layout_marginRight="@dimen/half_margin"
             android:layout_weight="1"
-            android:text="@string/update"
+            android:text="@string/siren_update"
             tools:ignore="ButtonStyle" />
 
     </LinearLayout>

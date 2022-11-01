@@ -70,7 +70,7 @@ public class SirenAlertWrapper {
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
         final Button skip = (Button) dialog.findViewById(R.id.btnSirenSkip);
 
-        update.setText(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.update, mLocale));
+        update.setText(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.siren_update, mLocale));
         nextTime.setText(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.next_time, mLocale));
         skip.setText(mSirenHelper.getLocalizedString(mActivityRef.get(), R.string.skip_this_version, mLocale));
 
