@@ -32,7 +32,7 @@ public class SirenTest {
     public void prepareTest() {
 
         siren = Mockito.spy(new Siren());
-        alertWrapper = Mockito.spy(new SirenAlertWrapper(null, null, null, null, null, null));
+        alertWrapper = Mockito.spy(new SirenAlertWrapper(null, null, null, null, null, null, null));
         //Mock SirenHelper class
         Mockito.when(sirenHelper.getAlertMessage(Mockito.any(Context.class), Mockito.anyString(), Mockito.any(SirenSupportedLocales.class))).thenReturn("");
         Mockito.when(sirenHelper.getDaysSinceLastCheck(activity)).thenReturn(0);
@@ -81,7 +81,7 @@ public class SirenTest {
         siren.mApplicationContext = activity;
 
         Mockito.when(siren.getSirenHelper()).thenReturn(sirenHelper);
-        Mockito.doReturn(alertWrapper).when(siren).getAlertWrapper(Mockito.any(SirenAlertType.class), Mockito.anyString());
+        Mockito.doReturn(alertWrapper).when(siren).getAlertWrapper(Mockito.any(SirenAlertType.class), Mockito.anyString(), Mockito.any());
 
         mockResult(TestConstants.jsonVersionNameMajorUpdate);
     }
@@ -279,7 +279,7 @@ public class SirenTest {
 
         siren.setVersionCodeUpdateAlertType(SirenAlertType.FORCE);
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
-        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString(), Mockito.any());
     }
 
     @Test
@@ -316,6 +316,6 @@ public class SirenTest {
 
         siren.checkVersion(activity, SirenVersionCheckType.IMMEDIATELY, APP_DESCRIPTION_URL);
 
-        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString());
+        Mockito.verify(siren).getAlertWrapper(eq(SirenAlertType.FORCE), Mockito.anyString(), Mockito.any());
     }
 }

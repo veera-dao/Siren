@@ -10,6 +10,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -110,15 +111,20 @@ class SirenHelper {
     }
 
 
-    void openGooglePlay(Activity activity) {
+    void openGooglePlay(Activity activity, @Nullable String updateUrl) {
         if (activity == null) {
             return;
         }
         final String appPackageName = getPackageName(activity);
-        try {
-            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-        } catch (android.content.ActivityNotFoundException e) {
-            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+
+        if (updateUrl == null) {
+            try {
+                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            } catch (android.content.ActivityNotFoundException e) {
+                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+        } else {
+            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl)));
         }
     }
 

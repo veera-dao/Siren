@@ -11,4 +11,7 @@ final class Constants {
     static final String JSON_FORCE_ALERT_TYPE = "force";
 
     static final String JSON_ENABLE_VERSION_CHECK = "enable";
+
+    static final String JSON_UPDATE_URL = "updateUrl";
+
 }

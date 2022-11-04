@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import java.lang.ref.WeakReference;
 
 public class SirenAlertWrapper {
@@ -17,14 +19,16 @@ public class SirenAlertWrapper {
     private final ISirenListener mSirenListener;
     private final SirenAlertType mSirenAlertType;
     private final String mMinAppVersion;
+    @Nullable private final String mUpdateUrl;
     private final SirenSupportedLocales mLocale;
     private final SirenHelper mSirenHelper;
 
     public SirenAlertWrapper(Activity activity, ISirenListener sirenListener, SirenAlertType sirenAlertType,
-                             String minAppVersion, SirenSupportedLocales locale, SirenHelper sirenHelper) {
+                             String minAppVersion, @Nullable String updateUrl, SirenSupportedLocales locale, SirenHelper sirenHelper) {
         this.mSirenListener = sirenListener;
         this.mSirenAlertType = sirenAlertType;
         this.mMinAppVersion = minAppVersion;
+        this.mUpdateUrl = updateUrl;
         this.mLocale = locale;
         this.mSirenHelper = sirenHelper;
         this.mActivityRef = new WeakReference<>(activity);
@@ -37,10 +41,10 @@ public class SirenAlertWrapper {
             if (mSirenListener != null) {
                 mSirenListener.onError(new NullPointerException("activity reference is null"));
             }
-        } else if (Build.VERSION.SDK_INT >= 17 && !activity.isDestroyed() || Build.VERSION.SDK_INT < 17 && !activity.isFinishing()) {
+        } else if (!activity.isDestroyed()) {
 
             AlertDialog alertDialog = initDialog(activity);
-            setupDialog(alertDialog);
+            setupDialog(alertDialog, this.mUpdateUrl);
 
             if (mSirenListener != null) {
                 mSirenListener.onShowUpdateDialog();
@@ -64,7 +68,7 @@ public class SirenAlertWrapper {
         return alertDialog;
     }
 
-    private void setupDialog(final AlertDialog dialog) {
+    private void setupDialog(final AlertDialog dialog, @Nullable String updateUrl) {
         TextView message = (TextView) dialog.findViewById(R.id.tvSirenAlertMessage);
         Button update = (Button) dialog.findViewById(R.id.btnSirenUpdate);
         Button nextTime = (Button) dialog.findViewById(R.id.btnSirenNextTime);
@@ -86,7 +90,7 @@ public class SirenAlertWrapper {
                         mSirenListener.onLaunchGooglePlay();
                     }
                     dialog.dismiss();
-                    mSirenHelper.openGooglePlay(mActivityRef.get());
+                    mSirenHelper.openGooglePlay(mActivityRef.get(), updateUrl);
                 }
             });
         }
